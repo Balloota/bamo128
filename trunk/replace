@@ -1,0 +1,14 @@
+#!/bin/bash
+search="$1"
+sub="$2"
+if  [ "$#" -ne "2"  ]
+then
+echo  anz args falsch
+exit -1
+fi
+for file in *.asm *.h
+do
+echo $file  : `grep "$search" $file| wc -l` Ersetzungen
+cat $file | sed "s/$search/$sub/g"> ${file}.mod
+mv ${file}.mod ${file}
+done

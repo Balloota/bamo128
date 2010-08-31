@@ -1,0 +1,61 @@
+#
+#* HWR-Berlin, Fachbereich Berufsakademie, Fachrichtung Informatik: bajos@ba-berlin.de
+#* See the file "license.terms" for information on usage and redistribution of this file.
+# 
+
+Bamo128
+Bamo128 is a resident monitor program for AVR8 microcontrollers. The monitor is written
+in assembler (GNU toolchain: avr-as) and communicates with the host-PC over a serial interface
+with an appropriate terminal program (advantageously minikermit from cs.ba-berlin.de).
+With bamo128 you can:
+- visit/modify/copy the different memories in an AVR8 microcontroller
+- load in flash (with ISP programming over serial or usb port)  and execute (also in step-mode
+  and with break-points) asm- and C- programs
+- visit and modify cpu-state (flags, regs,...)
+- disassemble flash instructions.
+Useful monitor functions can be linked to external asm- C-programs with a linker script.
+For this functionality Bamo128 needs 4 KWords (8K Bytes) of flash memory advantageously
+in the boot section of the microcontroller and about 256 bytes ram for monitor variables (MONRAM). Bamo128 writes the ISR jump table at flash address 0000.
+Currently we use bamo128 at boards with the atmega128 (CharonII with 32K external RAM and the Mica2 without external RAM).
+
+The version bamo128V06 can be used with the ArduinoMega-Bord (atmega1280) also.
+
+You can simple burn the monitor in a naked microcontroller with your programmer.
+We use for the CharonII the STK500-programmer and usip and for the ArduinoMega the programmer avrISPmkII and avrdude 
+
+From command line in linux type for the ArduinoMega board:
+$> make fuses AM		
+writes fuses ( 4Kword boot section, start after reset in boot section).
+$> make upLoad AM
+generates the hex file bamo128.hex and burns the monitor file  in the microcontroller atmega1280 on the ArduinoMega board
+You can now with 
+$> ./minikermit
+or other terminal programs communicate with the monitor from the host-PC.
+An cross compiled program (bin format) is uploaded with the monitor w-command
+in cooperation with the terminal program minikermit (cs.ba-berlin.de).
+
+$>./minikermit		# compile minikermit with 115200 and your serial lines
+
+that is the coldstart greeting line and the prompt af bamo128:
+    ___________________BAMo128 Version:0.06 _________________
+     from students of the BA Berlin written for the ArduinoMega
+
+    BAMo128 #>
+
+now type 'w':
+    BAMo128 #>name of cob (bin) -file for uploading:
+
+and type the bin-file name of your program:
+    BAMo128 #>name of cob (bin) -file for uploading:        my.bin
+    page:   1 with af bytes written (last page)  filelength: 01af
+    BAMo128 #> 
+
+you can start now the program with g startaddress, addresses are word addresses.
+If necessary you can set registers/flags/io-ports/memory before program-start:
+    BAMo128 #> g 80
+
+If you finish your application asm-program with "ret" (for C-programs modify the exit function), you get back to the monitor and you can now inspect memory and registers of cpu with monitor commands.
+    BAMo128 #> u 80
+disassembles the program.
+    BAMo128 #> s 80
+allows debugging in step mode.
