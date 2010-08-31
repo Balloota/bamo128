@@ -1,0 +1,113 @@
+K 25
+svn:wc:ra_dav:version-url
+V 30
+/svn/repos/!svn/ver/37/bamo128
+END
+console.asm
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/repos/!svn/ver/970/bamo128/console.asm
+END
+sram.asm
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/repos/!svn/ver/940/bamo128/sram.asm
+END
+consolecontrol.asm
+K 25
+svn:wc:ra_dav:version-url
+V 50
+/svn/repos/!svn/ver/970/bamo128/consolecontrol.asm
+END
+go.asm
+K 25
+svn:wc:ra_dav:version-url
+V 38
+/svn/repos/!svn/ver/970/bamo128/go.asm
+END
+bamo128.asm
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/repos/!svn/ver/969/bamo128/bamo128.asm
+END
+instructions.h
+K 25
+svn:wc:ra_dav:version-url
+V 46
+/svn/repos/!svn/ver/508/bamo128/instructions.h
+END
+constants.asm
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/repos/!svn/ver/970/bamo128/constants.asm
+END
+defines.asm
+K 25
+svn:wc:ra_dav:version-url
+V 43
+/svn/repos/!svn/ver/970/bamo128/defines.asm
+END
+mainloop.asm
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/repos/!svn/ver/970/bamo128/mainloop.asm
+END
+definitions.h
+K 25
+svn:wc:ra_dav:version-url
+V 45
+/svn/repos/!svn/ver/753/bamo128/definitions.h
+END
+register.asm
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/repos/!svn/ver/970/bamo128/register.asm
+END
+transfer.asm
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/repos/!svn/ver/970/bamo128/transfer.asm
+END
+disass.asm
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/repos/!svn/ver/508/bamo128/disass.asm
+END
+eeprom.asm
+K 25
+svn:wc:ra_dav:version-url
+V 42
+/svn/repos/!svn/ver/753/bamo128/eeprom.asm
+END
+help.asm
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/repos/!svn/ver/970/bamo128/help.asm
+END
+license.terms
+K 25
+svn:wc:ra_dav:version-url
+V 44
+/svn/repos/!svn/ver/37/bamo128/license.terms
+END
+flash.asm
+K 25
+svn:wc:ra_dav:version-url
+V 41
+/svn/repos/!svn/ver/970/bamo128/flash.asm
+END
+Makefile
+K 25
+svn:wc:ra_dav:version-url
+V 40
+/svn/repos/!svn/ver/940/bamo128/Makefile
+END
