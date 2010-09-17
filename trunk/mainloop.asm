@@ -18,7 +18,6 @@ startClearBreaks:	clr	zeroReg				// for C-compiler
 startClearBreaksLoop:	st	Y+,zeroReg
 			dec	argVL
 			brne	startClearBreaksLoop
-			ENABLEMILLISECTIMER
 			ldi	argVL,lo8(STACKUSER-1)
 			sts	USERSP,argVL
 			ldi	argVH,hi8(STACKUSER-1)			; sicherheitshalber user stack setzen!!
