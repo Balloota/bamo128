@@ -1,6 +1,6 @@
 #ifdef	CHARON
-#include	"ivtabcharon.asm"
+#include	"charonivtab.asm"
 #endif
 #ifdef	ARDUINOMEGA
-#include	"ivtabarduinomega.asm"
+#include	"arduinomegaivtab.asm"
 #endif
