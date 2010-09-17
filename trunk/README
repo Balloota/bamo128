@@ -9,7 +9,7 @@ in assembler (GNU toolchain: avr-as) and communicates with the host-PC over a se
 with an appropriate terminal program (advantageously minikermit from cs.ba-berlin.de).
 With bamo128 you can:
 - visit/modify/copy the different memories in an AVR8 microcontroller
-- load in flash (with ISP programming over serial or usb port)  and execute (also in step-mode
+- load in flash (with bootloader over serial or usb port)  and execute (also in step-mode
   and with break-points) asm- and C- programs
 - visit and modify cpu-state (flags, regs,...)
 - disassemble flash instructions.
@@ -24,13 +24,13 @@ You can simple burn the monitor in a naked microcontroller with your programmer.
 We use for the CharonII the STK500-programmer and usip and for the ArduinoMega the programmer avrISPmkII and avrdude 
 
 From command line in linux type for the ArduinoMega board:
-$> make fuses AM		
+$> make fuses am		
 writes fuses ( 4Kword boot section, start after reset in boot section).
-$> make upLoad AM
+$> make all am
 generates the hex file bamo128.hex and burns the monitor file  in the microcontroller atmega1280 on the ArduinoMega board
 You can now with 
 $> ./minikermit
-or other terminal programs communicate with the monitor from the host-PC.
+or other termibnal programs communicate with the monitor from the host-PC.
 An cross compiled program (bin format) is uploaded with the monitor w-command
 in cooperation with the terminal program minikermit (cs.ba-berlin.de).
 
