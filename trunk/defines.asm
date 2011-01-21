@@ -5,13 +5,10 @@
 #ifndef		__DEFINES__
 #define		__DEFINES__
 
-<<<<<<< .mine
 // Monitordefinitionen
 //#define		VERSION		"0.06"
 
 
-=======
->>>>>>> .r32
 #define		MONRAMBYTES	0x100
 
 // CPU-state
