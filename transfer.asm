@@ -19,130 +19,129 @@
 .global copy
 .global uploadwrite
 
-copy:				rcall	echo
-					rcall	switchCase
-					.byte	's'
-					.word	pm(copySramTo)
-					.byte	'e'
-					.word	pm(copyEepromTo)
-					.byte	'f'
-					.word	pm(copyFlashTo)
-					.byte	0
-					.word	pm(mainLoop)
+copy:			rcall	echo
+			rcall	switchCase
+			.byte	's'
+			.word	pm(copySramTo)
+			.byte	'e'
+			.word	pm(copyEepromTo)
+			.byte	'f'
+			.word	pm(copyFlashTo)
+			.byte	0
+			.word	pm(mainLoop)
 .align 1					
 copySramTo:		rcall	echo
-					rcall	switchCase
-					.byte	's'
-					.word	pm(sRamCopy)
-					.byte	'e'
-					.word	pm(sRamEEpromCopy)
-					.byte	'f'
-					.word	pm(sRamFlashCopy)
-					.byte	0
-					.word	pm(mainLoop)
+			rcall	switchCase
+			.byte	's'
+			.word	pm(sRamCopy)
+			.byte	'e'
+			.word	pm(sRamEEpromCopy)
+			.byte	'f'
+			.word	pm(sRamFlashCopy)
+			.byte	0
+			.word	pm(mainLoop)
 .align 1
-copyEepromTo:	rcall	echo
-					rcall	switchCase
-					.byte	'e'
-					.word	pm(eEpromCopy)
-					.byte	's'
-					.word	pm(eEpromSRamCopy)
-					.byte	0
-					.word	pm(mainLoop)
+copyEepromTo:		rcall	echo
+			rcall	switchCase
+			.byte	'e'
+			.word	pm(eEpromCopy)
+			.byte	's'
+			.word	pm(eEpromSRamCopy)
+			.byte	0
+			.word	pm(mainLoop)
 .align 1
 copyFlashTo:		rcall	echo	
-					rcall		conInAdrSupWS		// test for valid addresses!!
-					mov		ZL,YL				//sta
-					mov		ZH,YH
-					rcall		spaceConOut
-					rcall		conInAdrSupWS
-					mov		XL,YL				// endadr
-					mov		XH,YH
-					rcall 		spaceConOut
-					rcall		conInAdrSupWS	// destadr			
-copyFlashTosRam3:		push	YL
-					push	YH
-					mov	YL,ZL
-					mov	YH,ZH
-					rcall	getFlashWord			// in argVL,argVH
-					pop	YH
-					pop	YL
-					cp		XL,ZL
-					cpc		XH,ZH
-					breq	sRamReturn
-					adiw	ZL,1
-					push	argVL
-					mov	argVL,argVH			// big endian first !!
-					rcall		setSRamByte
-					adiw	YL,1
-					pop	argVL
-					rcall		setSRamByte
-					adiw	YL,1
-					rjmp	copyFlashTosRam3
+			rcall		conInAdrSupWS		// test for valid addresses!!
+			mov		ZL,YL				//sta
+			mov		ZH,YH
+			rcall		spaceConOut
+			rcall		conInAdrSupWS
+			mov		XL,YL				// endadr
+			mov		XH,YH
+			rcall 		spaceConOut
+			rcall		conInAdrSupWS	// destadr			
+copyFlashTosRam3:	push	YL
+			push	YH
+			mov	YL,ZL
+			mov	YH,ZH
+			rcall	getFlashWord			// in argVL,argVH
+			pop	YH
+			pop	YL
+			cp		XL,ZL
+			cpc		XH,ZH
+			breq	sRamReturn
+			adiw	ZL,1
+			push	argVL
+			mov	argVL,argVH			// big endian first !!
+			rcall		setSRamByte
+			adiw	YL,1
+			pop	argVL
+			rcall		setSRamByte
+			adiw	YL,1
+			rjmp	copyFlashTosRam3
 
 	; s
-
 .align 1
 sRamCopy:		rcall		conInAdrSupWS		// test for valid addresses!!
-					mov		XL,YL				//sta
-					mov		XH,YH
-					rcall			spaceConOut
-					rcall		conInAdrSupWS
-					mov		ZL,YL				// endadr
-					mov		ZH,YH
-					rcall 		spaceConOut
+			mov		XL,YL				//sta
+			mov		XH,YH
+			rcall			spaceConOut
+			rcall		conInAdrSupWS
+			mov		ZL,YL				// endadr
+			mov		ZH,YH
+			rcall 		spaceConOut
 sRamCopy2:		rcall		conInAdrSupWS	// destadr			
 sRamCopy3:		push	YL
-					push	YH
-					mov	YL,XL
-					mov	YH,XH
-					push	ZH
-					push	ZL
-					rcall		getSRamByte
-					pop	ZL
-					pop	ZH
-					adiw	XL,1
-					pop	YH
-					pop	YL
-					push		ZH
-					push ZL
-					rcall		setSRamByte
-					pop	ZL
-					pop	ZH
-					adiw	YL,1
-					cp		XL,ZL
-					cpc		XH,ZH
-					brne	sRamCopy3
+			push	YH
+			mov	YL,XL
+			mov	YH,XH
+			push	ZH
+			push	ZL
+			rcall		getSRamByte
+			pop	ZL
+			pop	ZH
+			adiw	XL,1
+			pop	YH
+			pop	YL
+			push		ZH
+			push ZL
+			rcall		setSRamByte
+			pop	ZL
+			pop	ZH
+			adiw	YL,1
+			cp		XL,ZL
+			cpc		XH,ZH
+			brne	sRamCopy3
 sRamReturn:		ret
 
-sRamEEpromCopy:	rcall		conInAdrSupWS		// test for valid addresses!!
-					mov		XL,YL				//sta
-					mov		XH,YH
-					rcall			spaceConOut
-					rcall		conInAdrSupWS
-					mov		ZL,YL				// endadr
-					mov		ZH,YH
-					rcall spaceConOut
-					rcall		conInAdrSupWS	// destadr			
-sRamEEpromCopy3:		push	YL
-					push	YH
-					mov	YL,XL
-					mov	YH,XH
-					push	ZH
-					push	ZL
-					rcall		getSRamByte
-					pop	ZL
-					pop	ZH
-					adiw	XL,1
-					pop	YH
-					pop	YL
-					rcall		setEEPromByte
-					adiw	YL,1
-					cp		XL,ZL
-					cpc		XH,ZH
-					brne	sRamEEpromCopy3
+sRamEEpromCopy:		rcall		conInAdrSupWS		// test for valid addresses!!
+			mov		XL,YL				//sta
+			mov		XH,YH
+			rcall			spaceConOut
+			rcall		conInAdrSupWS
+			mov		ZL,YL				// endadr
+			mov		ZH,YH
+			rcall spaceConOut
+			rcall		conInAdrSupWS	// destadr			
+sRamEEpromCopy3:	push	YL
+			push	YH
+			mov	YL,XL
+			mov	YH,XH
+			push	ZH
+			push	ZL
+			rcall		getSRamByte
+			pop	ZL
+			pop	ZH
+			adiw	XL,1
+			pop	YH
+			pop	YL
+			rcall		setEEPromByte
+			adiw	YL,1
+			cp		XL,ZL
+			cpc		XH,ZH
+			brne	sRamEEpromCopy3
 sRamEnd:
-sRamFlashEnd:	ret		
+sRamFlashEnd:		ret		
 //csf
 sRamFlashCopy:	rcall	outFlashText
 .string		"dangerous!!!\t"
