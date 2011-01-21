@@ -48,6 +48,12 @@
 		      ldi	argVL,(1<<SRE)| (1<<IVCE) $ \
 		      out	_SFR_IO_ADDR(MCUCR), argVL
 
+#define	ENABLEMILLISECTIMER	out	_SFR_IO_ADDR(TCCR1A),zeroReg	/* ms-timer1 ctc  counts up to OCR1A*/$ \
+			ldi	argVL, hi8(CPUFREQUENZ/1000) $ \
+			out	_SFR_IO_ADDR(OCR1AH),argVL $ \
+			ldi	argVL, lo8(CPUFREQUENZ/1000) $ \
+			out	_SFR_IO_ADDR(OCR1AL),argVL
+
 #define	ENABLEMONITORUART	\
 usartInit0:		lds	argVL, UCSR0A		/* sbis	_SFR_IO_ADDR(UCSRA), UDRE*/ $ \
 			sbrs	argVL,UDRE0	$ \
@@ -76,17 +82,11 @@ serOut1:	lds	argVL,UCSR0A	$ \
 ;			sbis	_SFR_IO_ADDR(UCSRA),RXC0			; Test RXC-bit for waiting characters
 
 #define STARTMILLISECTIMER	\
-			clr	zeroReg    $ \
-			out	_SFR_IO_ADDR(TCCR1A),zeroReg	/* ms-timer1 ctc  counts up to OCR1A*/$ \
-			ldi	argVL, hi8(CPUFREQUENZ/1000) $ \
-			out	_SFR_IO_ADDR(OCR1AH),argVL $ \
-			ldi	argVL, lo8(CPUFREQUENZ/1000) $ \
-			out	_SFR_IO_ADDR(OCR1AL),argVL   $ \
-			ldi	argVL,1+(1<<WGM12)		/*	clock divider 1 (sysclock), ctc-mode*/ $ \
-			out	_SFR_IO_ADDR(TCCR1B),argVL		/* system clock divided by 1*/	$ \
-			in	argVL,_SFR_IO_ADDR(TIMSK) $ \
-			sbr	argVL,(1<<OCIE1A)	$ \
-			out	_SFR_IO_ADDR(TIMSK),argVL
+		ldi	argVL,1+(1<<WGM12)		/*	clock divider 1 (sysclock), ctc-mode*/ $ \
+		out	_SFR_IO_ADDR(TCCR1B),argVL		/* system clock divided by 1*/	$ \
+		in	argVL,_SFR_IO_ADDR(TIMSK) $ \
+		sbr	argVL,(1<<OCIE1A)	$ \
+		out	_SFR_IO_ADDR(TIMSK),argVL
 		
 #define STOPMILLISECTIMER	\
 		ldi	argVL,(1<<WGM12)	/* stop sys clock timer 1	*/$ \
