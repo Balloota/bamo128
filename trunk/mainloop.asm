@@ -30,7 +30,12 @@ startClearBreaksLoop:	st	Y+,zeroReg
 			out	_SFR_IO_ADDR(SPL),argVL		; an Stapelzeiger monitor stack
 			ldi	argVH, hi8(STACKMON-1) 		; Unteres Byte
 			out	_SFR_IO_ADDR(SPH),argVH
-			rcall	JToutFlashText					;Ausgabe des StartStrings
+#if ARDUINOMEGA && STK500PROTOCOLUPLOADFLASH
+			rcall	waitForKeyStroke
+			sbrc	argVL,0
+			jmp prepareUpLoadFlash			// if key presses immediately after reset jump to upload flash
+#endif
+mainLoop7:		rcall	JToutFlashText					;Ausgabe des StartStrings
 #ifndef TESTVERSION
 .string	"\r_______BAMo128 Version:"
 #else
@@ -53,15 +58,18 @@ startClearBreaksLoop:	st	Y+,zeroReg
  			ldi     argVL,hi8(pm(bamoEnd))
 			rcall	byteConOut
  			ldi     argVL,lo8(pm(bamoEnd))
-			rcall	byteConOut			
+			rcall	byteConOut
+			rcall	JToutFlashText
+.string	" _____\r\nfrom students of the BA Berlin written for the "
+.align 1				
 #ifdef CHARON
 			rcall	JToutFlashText
-.string	" _____\r\nfrom students of the BA Berlin written for the Charon 2\r\n"
+.string	"Charon 2\r\n"
 .align 1	
 #endif
 #ifdef ARDUINOMEGA
 			rcall	JToutFlashText
-.string	" _____\r\nfrom students of the BA Berlin written for the ArduinoMega\r\n"
+.string	"ArduinoMega\r\n"
 .align 1	
 #endif
 ;###############################################################################################
@@ -73,7 +81,9 @@ mainLoop:	cli
 		out	_SFR_IO_ADDR(SPH),argVH
 		ldi	ZH,hi8(pm(mainLoop))
 		ldi	ZL,lo8(pm(mainLoop))
-		rcall	startTimer1			// sei also
+//		rcall	startTimer1			// sei also milliSec Timer with interrupt
+// uncmment this above, if you understand avr interrupt handling
+// you can use the millisec timer 1 and step timer 0 with arduino also -> see arduinoAndBamo128Interrupts.txt
 		push	ZL
 		push	ZH	; return mainLoop on stack
 		rcall	JTsetFGBlack
@@ -84,7 +94,7 @@ mainLoop:	cli
 		rcall	JToutFlashText
 .string	"BAMo128 #>"		; the prompt
 .align 1
-		rcall	conIn
+mainLoop6:	rcall	conIn
 		set
 		cpi	argVL,LFCR		
 		sts	SUPPRESSHEADLINE,argVL	; lfcr -> suppress headline r-command
@@ -98,13 +108,18 @@ mainLoop:	cli
 mainLoop5:	lds	argVL,LASTCOMMAND
 		rcall	conOut
 		rcall	JTspaceConOut
-mainLoop4:	rcall	switchCase
+mainLoop4:	call	switchCase
 		.byte	'm'
 		.word	pm(sRamDump)
+#ifdef	STK500PROTOCOLUPLOADFLASH
 		.byte	'w'
-		.word	pm(upLoadFlash)
+		.word	pm(foreEver)	// nothing to do , wait for reset from minikermit
+#else
+		.byte	'w'
+		.word	pm(upLoadFlash)	// upload with bamo128 - command
 		.byte	'j'
 		.word	pm(upLoadFlashWithOffset)
+#endif
 		.byte	'W'
 		.word	pm(upLoadSRam)
 		.byte	'r'
@@ -119,8 +134,8 @@ mainLoop4:	rcall	switchCase
 		.word	pm(execute)
 		.byte	'b'
 		.word	pm(break)
-		.byte	'a'
-		.word	pm(showAuthors)
+//		.byte	'a'
+//		.word	pm(showAuthors)
 		.byte	'e'
 		.word	pm(eePromDump)
 		.byte	'h'
@@ -129,13 +144,16 @@ mainLoop4:	rcall	switchCase
 		.word	pm(flashDump)			
 		.byte	'c'
 		.word	pm(copy)
-		.byte	'u'
-		.word	pm(dissass)				; Ende der Tabelle
+		.byte	'u
+		.word	pm(dissass)				
+; end of table
 		.byte	0					; default
 		.word	pm(noInstr)
 .align 1
-noInstr:	rcall	outFlashText
+noInstr:	call	outFlashText
 .string	"\r\nPress h for help..."
 .align 1			
 		ret
-
+#ifdef STK500PROTOCOLUPLOADFLASH
+foreEver:	rjmp	foreEver	// wait for reset!!
+#endif
