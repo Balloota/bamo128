@@ -1,4 +1,3 @@
-#define ATMEGA1280
 
 #define		INTERNALFLASHSTART		0x0000		// words
 #define		INTERNALFLASHLENGTH		0x10000		// 64Kwords
@@ -19,14 +18,17 @@
 
 #define		CPUFREQUENZ			16000000
 
-#define		BAMOBAUDRATE			115200
+#define		BAMOBAUDRATE			57600		// for arduino??   //115200
 
 #define		LARGEBOOTSTART			0xF000		// words
 
 #define		stepIntTimeConst		0x6
 
+#if BAMOBAUDRATE == 115200
+.equ		bdteiler,(CPUFREQUENZ/(16*BAMOBAUDRATE)-1)	; Baud-Divider
+#else
 .equ		bdteiler,(CPUFREQUENZ/(16*BAMOBAUDRATE))	; Baud-Divider
-
+#endif
 
 #define ENABLEEXTERNALRAM
 
@@ -34,16 +36,31 @@
 usartInit0:		lds	argVL, UCSR0A		/* sbis	_SFR_IO_ADDR(UCSRA), UDRE*/ $ \
 			sbrs	argVL,UDRE0	$ \
 			rjmp	usartInit0	 		/* Transmitter busy*/ $ \
+			ldi 	argVL,0	$ \
+			sts	UCSR0B,argVL			/* disable receiver, emitter*/ $ \
+			sts	UCSR0A,argVL		$ \
 			ldi	argVL,hi8(bdteiler)		/* Baudgenerator*/ $ \
 			sts	UBRR0H,argVL 			/* Set divider*/ $ \
 			ldi	argVL,lo8(bdteiler)		/* Baudgenerator*/ $ \
 			sts	UBRR0L,argVL 			/* Set divide*/ $ \
+			ldi	argVL, 0x06/*(1<<USBS0)|(3<<UCSZ00)*/	/* Set frame format: 8data, 1(2)stop bit */ $ \
+			sts	UCSR0C ,argVL	$ \
+			lds	argVL,DDRE	$ \
+			andi	argVL,~PINE0	$ \
+			sts	DDRE,argVL	$ \
+			lds	argVL,PORTE	$ \
+			ori	argVL,PINE0	$ \
+			sts	PORTE,argVL	$ \
 			ldi	argVL,(1<<RXEN0)|(1<<TXEN0)	/* Enable receiver and transmitter */ $ \
-			sts	UCSR0B,argVL			/* out		_SFR_IO_ADDR(UCSRB), argVL*/ $ \
-			ldi	argVL, (1<<USBS0)|(3<<UCSZ00)	/* Set frame format: 8data, 2stop bit */ $ \
-			sts	UCSR0C ,argVL
+			sts	UCSR0B,argVL			/* out		_SFR_IO_ADDR(UCSRB), argVL*/ 
+
 			
+//		ldi	argVL,0x06
+//		sts	UCSR0C,argVL
+
+	
 #define SEROUTMACRO	\
+		push	argVL	$ \
 serOut1:	lds	argVL,UCSR0A	$ \
 		sbrs	argVL,UDRE0		/* Wait until transmit buffer empty */	$ \
 		rjmp	serOut1				/* Transmitter busy*/	$ \
