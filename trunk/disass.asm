@@ -10,11 +10,11 @@
 #include "defines.asm"
 
 
-dissass:	rcall		conInADRSupWSTestCR			; ,LASTADR
+dissass:		rcall		conInADRSupWSTestCR			; ,LASTADR
 			rcall		lfcrConOut
-			ldi			XL,0x8
+			ldi		XL,0x8
 			movw		r22,YL						; PC
-dissass0:	movw		argVL,r22
+dissass0:		movw		argVL,r22
 			rcall		adrConOut
 			rcall		spaceConOut
 			movw		YL,argVL
@@ -27,8 +27,8 @@ dissass0:	movw		argVL,r22
 			movw		YL,r22
 			ADIW		YL,1
 			movw		r22,YL
-			sts			LASTADR,r22
-			sts			LASTADR+1,r23
+			sts		LASTADR,r22
+			sts		LASTADR+1,r23
 			rcall		lfcrConOut
 			pop		XL
 			dec		XL
