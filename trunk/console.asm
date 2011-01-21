@@ -46,6 +46,7 @@ eatWhiteSpaces; conInByteBit
 .global	testHex
 .global	hex2Ascii
 .global	convert2LowerCase
+.global waitForKeyStroke
 /*.global	decByteConOut
 decByteConOut: 	push	XL		; einer
 					mov	XL,argVL
@@ -74,10 +75,9 @@ decByteConOut4:	mov	argVL,XL
 					ret
 
 /**/				
-echo:						rcall 	serIn				; byte in char
+echo:		rcall 	serIn				; byte in char
 conOut:
-serOut:		push	argVL
-		SEROUTMACRO
+serOut:		SEROUTMACRO
 		ret	
 
 conIn:
@@ -88,11 +88,34 @@ serIn:		rcall 	serStat				; byte in char
 
 conStat:
 serStat:	set
+#ifdef ARDUINOMEGA
 		push	argVL
+#endif
 		SERSTATMACRO
 		clt
+#ifdef ARDUINOMEGA
 		pop	argVL
+#endif
 conControlEnd:	ret
+
+waitForKeyStroke: push	YL
+		push	YH
+		ldi	argVL,0
+		ldi	argVH,4//128//32//8//64//2 // adjust it
+		ldi	YL,0
+		ldi	YH,0
+waitForKeyStroke1: rcall conStat
+		brtc	waitForKeyStroke3
+		inc	argVL
+		rjmp	waitForKeyStroke2
+waitForKeyStroke3: adiw	YL,1		// wait loop
+		brne	waitForKeyStroke1
+		dec	argVH
+		brne	waitForKeyStroke1
+waitForKeyStroke2: pop	YH
+		pop	YL
+		ret
+		
 /**************************************************************************************************************/
 // bh
 // affected: all Flags
