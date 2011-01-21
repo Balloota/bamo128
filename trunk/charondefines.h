@@ -1,3 +1,4 @@
+
 #define		ATMEGA128
 
 #define		INTERNALFLASHSTART		0x0000		// words
@@ -61,6 +62,7 @@ usartInit0:		lds	argVL, UCSR0A		/* sbis	_SFR_IO_ADDR(UCSRA), UDRE*/ $ \
 			sts	UCSR0C ,argVL
 			
 #define SEROUTMACRO	\
+		push	argVL	$ \
 serOut1:	lds	argVL,UCSR0A	$ \
 		sbrs	argVL,UDRE0		/* Wait until transmit buffer empty */	$ \
 		rjmp	serOut1				/* Transmitter busy*/	$ \
