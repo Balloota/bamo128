@@ -21,6 +21,7 @@
 ; BA_Version 0.5	091711		bh -> arduinoMega, sysTime, dump sram error
 ; BA_Version 0.6	??????
 ; BA_Version 0.7	??????
+; version 0.8 		112501 		bh -> arduino/skt500v1 upload protocol integrated and sw - reset of arduino board
 ;*****************************************************************************
 // bamo128 in boot-flash-section from addr 0xF000 (words)
 // c-programms are written to 0 and overwrite page0 (128 words) or 0x80
@@ -58,7 +59,7 @@
 .org		BYTES(0x80),0xff	// application program 
 		ret
 // this works in bootsection for devieces with 4 kW boot section
-.org			BYTES(MONSTART),0xff	// 0x80 or BOOTSECTION
+.org			BYTES(MONSTART),0xff	// 0x80 or BOOTSECTION (0xF000 in words)
 BOOTSTART:		cli			;  no interrupt when stack is changed
 			rjmp	startMonitor
 /* jump table with useful addresses for linking at application programs*/
@@ -95,7 +96,11 @@ JTsetFGBlack:		jmp	setFGBlack				// BOOTSTART+54
 			jmp	saveCPU		//Time2Comp			// BOOTSTART+62	
 						// jump for interrupt in step mode
 			jmp	disAss		// BOOTSTART+64
+#ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
+			jmp	0
+#else
 			jmp	upLoadFlashWithOffset // BOOTSTART+66 page: 0..512 arg in X
+#endif
 			jmp	getFlashByte	// BOOTSTART+68 only upper half of flash
 
 ; timer 1 interrupt service routine , sysclock millisec
@@ -111,7 +116,7 @@ mySysClock1:	ld argVL,Z
 		inc argVL
 		st Z+,argVL
 		brne mySysClock2
-		cpi ZL,0x04	// 4 bytes unsiend int incremented?
+		cpi ZL,0x04	// 4 bytes unsigned int incremented?
 		brne mySysClock1
 mySysClock2:	pop argVL
 		out _SFR_IO_ADDR(SREG),argVL
