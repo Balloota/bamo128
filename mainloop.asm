@@ -82,7 +82,7 @@ mainLoop:	cli
 		ldi	ZH,hi8(pm(mainLoop))
 		ldi	ZL,lo8(pm(mainLoop))
 //		rcall	startTimer1			// sei also milliSec Timer with interrupt
-// uncmment this above, if you understand avr interrupt handling
+// uncomment this above, if you understand avr interrupt handling
 // you can use the millisec timer 1 and step timer 0 with arduino also -> see arduinoAndBamo128Interrupts.txt
 		push	ZL
 		push	ZH	; return mainLoop on stack
