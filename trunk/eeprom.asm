@@ -163,23 +163,23 @@ eePromMatrixEnd:		pop		argVH
 						ret
 
 getEEPromByte:		sbic	_SFR_IO_ADDR(EECR),BAMOEEWE
-						rjmp	getEEPromByte			; make sure EEPROM is ready
-						out		_SFR_IO_ADDR(EEARH),YH		; Set up address (r18:r17) in address register
-						out		_SFR_IO_ADDR(EEARL),YL		; Start eeprom read by writing EERE
-						sbi		_SFR_IO_ADDR(EECR), EERE
-						in		retVL, _SFR_IO_ADDR(EEDR)	; Read data from data register
-						ret
+			rjmp	getEEPromByte			; make sure EEPROM is ready
+			out	_SFR_IO_ADDR(EEARH),YH		; Set up address (r18:r17) in address register
+			out	_SFR_IO_ADDR(EEARL),YL		; Start eeprom read by writing EERE
+			sbi	_SFR_IO_ADDR(EECR), EERE
+			in	retVL, _SFR_IO_ADDR(EEDR)	; Read data from data register
+			ret
 		
 setEEPromByte:		sbic	_SFR_IO_ADDR(EECR), BAMOEEWE
-						rjmp	setEEPromByte		; make sure EEPROM is ready
-						out		_SFR_IO_ADDR(EEARH), YH
-						out		_SFR_IO_ADDR(EEARL), YL
-						out		_SFR_IO_ADDR(EEDR),argVL
-						push	argVL
-						in		argVL, _SFR_IO_ADDR(SREG)
-						cli					; no ints between setting EEMWE and MYEEWE
-						sbi		_SFR_IO_ADDR(EECR), BAMOEEMWE
-						sbi		_SFR_IO_ADDR(EECR), BAMOEEWE
-						out		_SFR_IO_ADDR(SREG), argVL
-						pop	argVL
-						ret
+			rjmp	setEEPromByte		; make sure EEPROM is ready
+			out		_SFR_IO_ADDR(EEARH), YH
+			out		_SFR_IO_ADDR(EEARL), YL
+			out		_SFR_IO_ADDR(EEDR),argVL
+			push	argVL
+			in		argVL, _SFR_IO_ADDR(SREG)
+			cli					; no ints between setting EEMWE and MYEEWE
+			sbi		_SFR_IO_ADDR(EECR), BAMOEEMWE
+			sbi		_SFR_IO_ADDR(EECR), BAMOEEWE
+			out		_SFR_IO_ADDR(SREG), argVL
+			pop	argVL
+			ret

@@ -5,6 +5,7 @@
 //  bh 1.10.06
 #include	<avr/io.h>
 #include "defines.asm"
+#include "boarddefines.h"
 
 .global	flashDump
 .global	getFlashWord
@@ -15,8 +16,8 @@
 .global	uploaderror
 .global upLoadFlashWithOffset
 .global	getFlashByte
-
-
+.global prepareUpLoadFlash
+.global prepareUpLoad
 
 // author:  			Tilo Kussatz 										;###   FLASH   ### 
 // date of creation: 		06.03.2006
@@ -45,13 +46,16 @@
 #define		SL		r22
 #define		SH		r23
 #define		SPos 	r18
+
 flashDump:			rcall		conInADRSupWSTestCR
 						mov		SL,YL
 						andi		SL, 0b11111000		; auf einen xxx8 - Wert geglaettet
-						mov		SH,YH
-						ldi			argVL, BLACK
-						rcall		setBGColor			; Hintergrund auf schwarz setzen
-flashLoop:				push		YL
+						mov		SH,YH	
+				rjmp	skippy
+				jmp	BOOTSTART	; ist for devices witk 2K word bott section, make it better
+skippy:				ldi		argVL, BLACK		
+				rcall		setBGColor			; Hintergrund auf schwarz setzen
+flashLoop:					push		YL
 						push		YH
 						mov		YL,SL
 						mov		YH,SH
@@ -192,6 +196,8 @@ getFlashByte:	push	ZH				; C conform only upper half of flash
 		pop	ZH
 		ret
 
+#ifndef STK500PROTOCOLUPLOADFLASH
+// special bamo128 upload protocol
 
 upLoadFlashWithOffset:	clt
 			rcall	outFlashText
@@ -208,17 +214,67 @@ upLoadFlashWithOffset:	clt
 .align 1
 			rcall	conIn
 			rjmp	upLoadFlashWithOffset1
-
+#endif
 uploaderror:		ldi		argVL,0x5
 			rcall	serOut				; turn on echo	
 			rcall	outFlashText
 .string	"\r\nflash write error???\r\n"
 .align 1	
 			rjmp	mainLoop
+
+#ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
+prepareUpLoadFlash:	// after reset
+			// rcall	stopTimer1
+prepareUpLoad:		// with bamo-w-command
+prepareBootLoading0:	ldi	YL,lo8(pm(prepareBootLoading0))
+			ldi	YH,hi8(pm(prepareBootLoading0))
+			push	YL
+			push	YH
+
+prepareBootLoading2:	rcall	waitForKeyStroke
+			sbrs	argVL,0
+			rjmp	mainLoop
+prepareBootLoading1:rcall	conIn
+		rcall	switchCase
+		.byte 	'd'	
+		.word	pm(writeData)
+		.byte 	'U'	
+		.word	pm(getAdr)
+		.byte	'0'
+		.word	pm(nothingResponse)
+		.byte 	'1'	
+		.word	pm(requestProgrammerID)
+		.byte 	'@'	
+		.word	pm(boardCommand)
+		.byte 	'A'	
+		.word	pm(boardRequest)
+		.byte 	'B'	
+		.word	pm(deviceParameter)
+		.byte 	'E'	
+		.word	pm(parProgrammer)
+		.byte 	'P'	
+		.word	pm(nothingResponse)
+		.byte 	'R'	
+		.word	pm(nothingResponse)
+		.byte 	'Q'		; quhuhhh!!!	
+		.word	pm(reEnter)
+		.byte 	'V'	
+		.word	pm(universalSPI)
+		.byte 	't'	
+		.word	pm(readData)
+		.byte 	'u'	
+		.word	pm(getSignature)
+		.byte 	'v'	
+		.word	pm(byteResponse0)
+		.byte	0					; default
+		.word	pm(prepareBootLoading0)
+.align 1
+
+#else // not recommended
 upLoadFlash:		ldi	XL,0	// RAMPZ 0 or 1
 			ldi	XH,0	// 256 pages with 256 words
 
-upLoadFlashWithOffset1:  //	rcall	stopTimer1
+upLoadFlashWithOffset1:  	rcall	stopTimer1
 		ldi	argVL,0x4
 		rcall	serOut				; turn off echo
 		rcall	serIn
@@ -273,7 +329,8 @@ uploadend:	rcall	conInAdrSupWS
 		movw	argVL,YL
 		rjmp	adrConOut
 
-// fuer Version 0.22	
+// fuer Version 0.22
+#endif
 							
 							
 							
@@ -281,8 +338,10 @@ uploadend:	rcall	conInAdrSupWS
 /*****************************************************************/
 
 
-Do_spm:		
-
+Do_spm:		in	argVH, _SFR_IO_ADDR(SREG)
+		push	argVH
+		cli
+Do_spm1:
 #ifdef ARDUINOMEGA
 		in 	 argVH,_SFR_IO_ADDR(SPMCSR)	; check for previous SPM complete
 #endif
@@ -290,9 +349,7 @@ Do_spm:
 		lds 	 argVH,SPMCSR	; check for previous SPM complete
 #endif
 		sbrc 	argVH, SPMEN
-		rjmp 	Do_spm
-		in	argVH, _SFR_IO_ADDR(SREG)
-		cli
+		rjmp 	Do_spm1
 #ifdef ARDUINOMEGA
 waitEE:		sbic	_SFR_IO_ADDR(EECR),EEPE
 		rjmp	waitEE
@@ -304,40 +361,41 @@ waitEE:		sbic	_SFR_IO_ADDR(EECR),EEPE
 		sts 	 SPMCSR, argVL	; check for previous SPM complete
 #endif
 		spm
+		pop	argVH
 		out	_SFR_IO_ADDR(SREG),argVH
 		ret
 
 // ZH,ZL modified
-switchCase:				pop	ZH
-							pop	ZL
-							push	argVL
-							push	argVH
-							in	argVH,_SFR_IO_ADDR(RAMPZ)
-							push	argVH
-							clr		argVH		//0
-							lsl		ZL
-							rol		ZH
-							brcc	switchCase0
-							inc 	argVH
-switchCase0:				out	_SFR_IO_ADDR(RAMPZ),argVH
-switchCase2:				elpm	argVH,Z+
-							or		argVH,argVH
-							breq	switchCaseEnd	// ende der fahnenstange
-							cp		argVH,argVL
-							breq	switchCaseEnd		// gefunden
-							elpm	argVH,Z+
-							elpm	argVH,Z+
-							rjmp	switchCase2
-switchCaseEnd:			elpm	argVL,Z+
-							elpm	ZH,Z
-							mov	ZL,argVL
-							pop	argVH
-							out	_SFR_IO_ADDR(RAMPZ),argVH
-							pop	argVH
-							pop	argVL
-							ijmp
+switchCase:		pop	ZH
+			pop	ZL
+			push	argVL
+			push	argVH
+			in	argVH,_SFR_IO_ADDR(RAMPZ)
+			push	argVH
+			clr		argVH		//0
+			lsl		ZL
+			rol		ZH
+			brcc	switchCase0
+			inc 	argVH
+switchCase0:		out	_SFR_IO_ADDR(RAMPZ),argVH
+switchCase2:		elpm	argVH,Z+
+			or		argVH,argVH
+			breq	switchCaseEnd	// ende der fahnenstange
+			cp		argVH,argVL
+			breq	switchCaseEnd		// gefunden
+			elpm	argVH,Z+
+			elpm	argVH,Z+
+			rjmp	switchCase2
+switchCaseEnd:		elpm	argVL,Z+
+			elpm	ZH,Z
+			mov	ZL,argVL
+			pop	argVH
+			out	_SFR_IO_ADDR(RAMPZ),argVH
+			pop	argVH
+			pop	argVL
+			ijmp
 // ZH,ZL modified
-outFlashText:				pop 	ZH				; write text from text segment
+outFlashText:		pop 	ZH				; write text from text segment
 							pop 	ZL				; get flash-textaddress->Initialize Z-pointer				
 							push	argVL
 							in		argVL,_SFR_IO_ADDR(SREG)
