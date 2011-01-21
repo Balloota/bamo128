@@ -8,6 +8,9 @@
 # for development set TESTVERSION to 0x80 (1) instead of 0xf000 (0)
 # step command doesnt work in test version
 VERSION = NOTESTVERSION 
+PROTOCOL = STK500PROTOCOLUPLOADFLASH
+# arduino like, with reset before bootload
+# if not defined use of old holznagel-protocol (not recommended)
 
 # whats target platform !!
 
@@ -16,11 +19,15 @@ ifeq ($(findstring am,$(MAKECMDGOALS)),am)
 	MCU =	atmega1280
 am:	
 	@:
-compile:	clean flash
-burn:	 	clean flash upLoadAM
+compile:	clean binary
+burn:	 	clean binary upLoadAM
 fuses:		writeFusesAM
+<<<<<<< .mine
+all:		burn
+=======
 
 all:		burn
+>>>>>>> .r26
 endif
 
 ifeq ($(findstring xplain,$(MAKECMDGOALS)),xplain)	# not realized yet
@@ -31,6 +38,7 @@ xplain:
 compile:	clean flash
 burn:	 	clean flash upLoadAM
 fuses:		writeFusesAM
+all:		burn fuses
 endif
 
 
@@ -51,15 +59,15 @@ ifeq ($(findstring DU,$(MAKECMDGOALS)),du)
 	#MCU =	atmega168
 DU:
 	@:
-compile:	clean flash
-upLoad: 	clean flash upLoadDU
+compile:	clean binary
+upLoad: 	clean binary upLoadDU
 fuses:		writeFusesCH
 endif
 
 #**************************************************************
 OBJECTS	= 	bamo128.o  mainloop.o register.o \
 		go.o   sram.o console.o flash.o disass.o consolecontrol.o \
-		transfer.o eeprom.o help.o constants.o
+		transfer.o eeprom.o help.o stk500.o constants.o
 
 MONITOR	= 	bamo128
 
@@ -78,7 +86,11 @@ TTY		= /dev/ttyUSB0
 #TEXTSEGMENT	= 0x100
 
 # binaries tools in avr32studio !!
+<<<<<<< .mine
+BINDIR	= /opt/cross/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86*/os/linux/x86_64/bin/
+=======
 #BINDIR	=	/opt/cross/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201007091540/os/linux/x86_64/bin/
+>>>>>>> .r26
 CC	= $(BINDIR)avr-gcc
 CPP	= $(BINDIR)avr-cpp
 AS	=$(BINDIR) avr-as
@@ -95,7 +107,7 @@ DONE    = @echo Errors: none
 
 ARCHITECTURE	= avr5
 #--- default assembler flags 
-ASFLAGS   = -Wa,-gstabs -Wa,-ahlms=$(<:.asm=.lst) -Wa,-mmcu=$(MCU)
+ASFLAGS   = -Wa,-gstabs -Wa,-ahlms=$(<:.asm=.lst) -Wa,-mmcu=$(MCU) -D$(PROTOCOL) -D$(BOARD)
 #--- default linker flags
 #LDFLAGS   = -Wl,-symbolic -Wl,-Map=$(PROJ).map,--cref,--defsym,__stack=0x1100 -nostartfiles -Ttext=0x1E000 -nodefaultlibs
 #LDFLAGS =    -nostartfiles -nodefaultlibs   -Wl,-Ttext=$(TEXTSEGMENT) -Wl,-m$(ARCHITECTURE)  -mmcu=$(MCU)
@@ -115,10 +127,10 @@ IHEXFORMAT	= ihex
 	$(CC)  -mmcu=$(MCU)  -D$(BOARD)  -D$(VERSION) -c $< -o $@
 
 %o : %s
-	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(VERSION) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU) -I$(INCDIR) -c $< -o $@
+	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(PROTOCOL) -D$(VERSION) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU) -I$(INCDIR) -c $< -o $@
 
 %o : %asm
-	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(VERSION) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU)   -c $< -o $@
+	$(CC) -x assembler-with-cpp -D$(BOARD) -D$(VERSION) -D$(PROTOCOL) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU)   -c $< -o $@
 
 #--- create flash file (binary) from elf output file overwrite elf file: result in .cob file
 %elf: %bin
@@ -144,7 +156,7 @@ help:
 
 
 
-flash:	$(OBJECTS)
+binary:	$(OBJECTS)
 	$(CC)  $(LDFLAGS)   -nostartfiles -nodefaultlibs   $(OBJECTS)  -o $(MONITOR).elf
 	@echo last byte: `avr-objdump -d bamo128.elf | tail -n2| sed '$d'| cut -f1| sed 's/://'`
 	$(DONE)
@@ -175,7 +187,7 @@ upLoadMote128:
 
 upLoadAM:
 	$(BIN)     -O binary  $(MONITOR).elf  $(MONITOR).bin
-	sudo avrdude -p m1280 -c avrispmkII -D -Pusb  -e -Uflash:w:bamo128.bin:a
+	sudo avrdude -p m1280 -c avrispmkII -D -Pusb  -V -e -Uflash:w:bamo128.bin:a
 	$(DONE)
 
 upLoadDU:
