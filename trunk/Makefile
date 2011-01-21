@@ -22,12 +22,7 @@ am:
 compile:	clean binary
 burn:	 	clean binary upLoadAM
 fuses:		writeFusesAM
-<<<<<<< .mine
 all:		burn
-=======
-
-all:		burn
->>>>>>> .r26
 endif
 
 ifeq ($(findstring xplain,$(MAKECMDGOALS)),xplain)	# not realized yet
@@ -66,7 +61,7 @@ endif
 
 #**************************************************************
 OBJECTS	= 	bamo128.o  mainloop.o register.o \
-		go.o   sram.o console.o flash.o disass.o consolecontrol.o \
+		go.o   sram.o console.o    disass.o   flash.o  consolecontrol.o \
 		transfer.o eeprom.o help.o stk500.o constants.o
 
 MONITOR	= 	bamo128
@@ -86,11 +81,7 @@ TTY		= /dev/ttyUSB0
 #TEXTSEGMENT	= 0x100
 
 # binaries tools in avr32studio !!
-<<<<<<< .mine
 BINDIR	= /opt/cross/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86*/os/linux/x86_64/bin/
-=======
-#BINDIR	=	/opt/cross/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86_64_3.0.0.201007091540/os/linux/x86_64/bin/
->>>>>>> .r26
 CC	= $(BINDIR)avr-gcc
 CPP	= $(BINDIR)avr-cpp
 AS	=$(BINDIR) avr-as
