@@ -5,6 +5,13 @@
 #ifndef		__DEFINES__
 #define		__DEFINES__
 
+<<<<<<< .mine
+// Monitordefinitionen
+//#define		VERSION		"0.06"
+
+
+=======
+>>>>>>> .r32
 #define		MONRAMBYTES	0x100
 
 // CPU-state
@@ -101,7 +108,7 @@
 #define		GREEN		0x32
 #define		BROWN		0x33
 #define		BLUE			0x34
-#define		PINK			0x35
+#define		MYPINK			0x35
 #define		CYAN			0x36
 #define		WHITE			0x37
 
