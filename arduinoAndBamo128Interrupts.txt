@@ -1,0 +1,34 @@
+The resident monitor bamo128 allows to start application programs with the go ('g')->command.
+Applications can use monitor functions and variables.
+If you dont link your application at the monitor bamo128 you can not use the step('s')- and break('x')- command 
+and you must uncomment in mainloop.asm the line:
+rcall startTimer1
+because timer1 works with interupts and your application at flash-address 0 overwrites
+the interrupt-vector-table in the most cases (if you link the application at address 0). 
+
+But there are possibilities to link application and monitor bamo128.
+One way is to add an appropiate linker script to your application project,
+another add this code bottom to your (arduino) C/C++ project code.
+Then the compiler inserts the jumps to the interrupt service routines in the application code
+and you can use e.g. SYSTIMEMILLISEC variable in your application code.
+
+#define		BYTES(word)	((word)*2)
+#define		STRING(a,b)	#a" "#b
+#define		INLINEASM(a,b)	STRING(a,b)
+#define		LARGEBOOTSTART	0xf000
+#define		BOARDRAMEND	0x2200
+#define		MONSTART	LARGEBOOTSTART
+#define 	MONRAM		(BOARDRAMEND-0x100)
+#define		SYSTIMEMILLISEC	(MONRAM+0x40)
+
+#define saveCPU		BYTES(LARGEBOOTSTART+62)//Time2Comp	// BOOTSTART+62		
+#define mySysClock      BYTES(LARGEBOOTSTART+56)/* timer1 overflow interrupt */
+
+
+// monitor interrupt für step ...
+ISR(SIG_OUTPUT_COMPARE2) __attribute__ ((naked));
+ISR(SIG_OUTPUT_COMPARE2) {asm volatile  (INLINEASM(jmp,saveCPU));}
+
+ISR(SIG_OUTPUT_COMPARE1A) __attribute__ ((naked));
+ISR(SIG_OUTPUT_COMPARE1A) {asm volatile  (INLINEASM(jmp,mySysClock));}
+ /* monitor for sysclock millisec */
