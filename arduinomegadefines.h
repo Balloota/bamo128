@@ -73,12 +73,13 @@ serOut1:	lds	argVL,UCSR0A	$ \
 			sbrs	argVL,RXC0 $ \
 ;			sbis	_SFR_IO_ADDR(UCSRA),RXC0			; Test RXC-bit for waiting characters
 
+#define	ENABLEMILLISECTIMER	sts TCCR1A,zeroReg	/* ms-timer1 ctc  counts up to OCR1A*/ $ \
+			ldi	argVL, hi8(CPUFREQUENZ/1000) $ \
+			sts	OCR1AH,argVL $ \
+			ldi	argVL, lo8(CPUFREQUENZ/1000) $ \
+			sts	OCR1AL,argVL
+
 #define STARTMILLISECTIMER	\
-		sts TCCR1A,zeroReg	/* ms-timer1 ctc  counts up to OCR1A*/ $ \
-		ldi	argVL, hi8(CPUFREQUENZ/1000) $ \
-		sts	OCR1AH,argVL $ \
-		ldi	argVL, lo8(CPUFREQUENZ/1000) $ \
-		sts	OCR1AL,argVL		$ \
 		ldi	argVL,1+(1<<WGM12)			/* clock divider 1 (sysclock), ctc-mode*/ $ \
 		sts	TCCR1B,argVL		/* system clock divided by 1*/	$ \
 		lds	argVL,TIMSK1 $ \
