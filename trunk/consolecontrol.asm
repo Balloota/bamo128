@@ -77,93 +77,101 @@ restoreCursor:					rcall	outFlashText
 .align 1
 								ret								
 clearScreenFromPosition:	rcall 	escKlammer
-								ldi		argVL,'J'
-								rjmp 	conOut
-								ret
-clearLineFromPos:			rcall 	escKlammer
-								ldi		argVL,'K'
-								rjmp 	conOut
-								ret
-clearLine:						rcall	outFlashText
-.string							"\033[2K"
+				ldi		argVL,'J'
+				rjmp 	conOut
+
+clearLineFromPos:		rcall 	escKlammer
+				ldi	argVL,'K'
+				rjmp 	conOut
+
+clearLine:			rcall	outFlashText
+.string				"\033[2K"
 .align 1
-								ret
-cursorOn:						rcall	outFlashText
-.string							"\033[?25h"				//h??
+				ret
+cursorOn:			rcall	outFlashText
+.string				"\033[?25h"				//h??
 .align 1
-								ret
-cursorOff:						rcall	outFlashText
-.string							"\033[?25h"				//h??!!
+				ret
+cursorOff:			rcall	outFlashText
+.string				"\033[?25h"				//h??!!
 .align 1
-								ret
-cursorDown:					rcall 	escKlammer
-								ldi		argVL,'B'
-								rjmp 	conOut
-cursorUp:						rcall 	escKlammer
-								ldi		argVL,'A'
-								rjmp 	conOut
-								ret
-cursorBack:					rcall 	escKlammer
-								ldi		argVL,'D'
-								rjmp 	conOut
-cursorFor:						rcall 	escKlammer
-								ldi		argVL,'C'
-								rjmp 	conOut
-lfConOut:						push	argVL
-								ldi		argVL,LF
-lfConOutEnd:					rcall	conOut
-								pop	argVL
-								ret
-lfcrConOut:					rcall	lfConOut
-crConOut:						push	argVL
-								ldi		argVL,CR
-								rjmp	lfConOutEnd
-spaceConOut:					push 	argVL				; argVL auf den Stack retten
-								ldi		argVL,SPACE
-								rjmp	lfConOutEnd
-adrConOut:					push	argVL	; gibt eine Adresse in argVH:argVLWL mit Hilfe von byteConOut aus
-								mov	argVL,argVH
-								rcall	byteConOut
-								pop	argVL
-								rjmp	byteConOut								
+				ret
+cursorDown:			rcall 	escKlammer
+				ldi		argVL,'B'
+				rjmp 	conOut
+
+cursorUp:			rcall 	escKlammer
+				ldi		argVL,'A'
+				rjmp 	conOut
+
+cursorBack:			rcall 	escKlammer
+				ldi		argVL,'D'
+				rjmp 	conOut
+
+cursorFor:			rcall 	escKlammer
+				ldi		argVL,'C'
+				rjmp 	conOut
+
+lfConOut:			push	argVL
+				ldi		argVL,LF
+lfConOutEnd:			rcall	conOut
+				pop	argVL
+				ret
+
+lfcrConOut:			rcall	lfConOut
+crConOut:			push	argVL
+				ldi		argVL,CR
+				rjmp	lfConOutEnd
+
+spaceConOut:			push 	argVL				; argVL auf den Stack retten
+				ldi		argVL,SPACE
+				rjmp	lfConOutEnd
+
+adrConOut:			push	argVL	; gibt eine Adresse in argVH:argVLWL mit Hilfe von byteConOut aus
+				mov	argVL,argVH
+				rcall	byteConOut
+				pop	argVL
+				rjmp	byteConOut								
+
 	;Cursor argVL Zeichen nach links/rechts argVL als hex 
-setCursorXLeft:					rcall 	escKlammer
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,'D'
-								rjmp 	conOut
-setCursorXRight:				rcall 	escKlammer
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,'C'
-								rjmp 	conOut
+setCursorXLeft:			rcall 	escKlammer
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,'D'
+				rjmp 	conOut
+setCursorXRight:		rcall 	escKlammer
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,'C'
+				rjmp 	conOut
 								
-escKlammer:						rcall	outFlashText
+escKlammer:			rcall	outFlashText
 .string				"\033["
 .align 1
-								ret
+				ret
+
 // argVL-> x, argVH->y als hex von 0 bis..
 ;**printf("%c[%d;%dH",27,y+1,x+1);
-setCursorXY:					push 	argVL
-								rcall	escKlammer
-								mov	argVL,argVH
-								inc		argVL
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,';'
-								rcall	conOut
-								pop	argVL
-								inc		argVL
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,'H'
-								rjmp	conOut
+setCursorXY:			push 	argVL
+				rcall	escKlammer
+				mov	argVL,argVH
+				inc		argVL
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,';'
+				rcall	conOut
+				pop	argVL
+				inc		argVL
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,'H'
+				rjmp	conOut
 
-setCursorYUp:				rcall 	escKlammer
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,'A'
-								rjmp 	conOut
+setCursorYUp:			rcall 	escKlammer
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,'A'
+				rjmp 	conOut
 
-setCursorYDown:				rcall 	escKlammer
-								rcall	hex2AsciiDecConOut
-								ldi		argVL,'B'
-								rjmp 	conOut
+setCursorYDown:			rcall 	escKlammer
+				rcall	hex2AsciiDecConOut
+				ldi		argVL,'B'
+				rjmp 	conOut
 
 /************************************************************************************************************************************************/
 // autor:  			Christian Schmidt
@@ -183,30 +191,32 @@ setCursorYDown:				rcall 	escKlammer
 // argVL=4 - rot
 // argVL=5 - weiß	; eigentlich grau
 	; Schriftfarbe aendern, alle danach geschriebenen Zeichen haben die Farbe
-setFGGreen:					push 	argVL
-								ldi		argVL,GREEN
-setFGGreen0:					rcall	setFGColor
-								pop	argVL
-								ret
-setFGBlack:					push	argVL
-								ldi		argVL,BLACK
-								rjmp	setFGGreen0
-setFGBlue:					push	argVL
-								ldi		argVL,BLUE
-								rjmp	setFGGreen0
+setFGGreen:			push 	argVL
+				ldi		argVL,GREEN
+setFGGreen0:			rcall	setFGColor
+				pop	argVL
+				ret
+
+setFGBlack:			push	argVL
+				ldi		argVL,BLACK
+				rjmp	setFGGreen0
+
+setFGBlue:			push	argVL
+				ldi		argVL,BLUE
+				rjmp	setFGGreen0
 					
-setFGRed:						push	argVL
-								ldi		argVL,RED
-								rjmp	setFGGreen0
-setFGWhite:					push	argVL
-								ldi		argVL,WHITE
-								rjmp	setFGGreen0
-setFGColor:					push	argVL				;Fontfarbe setzen
-								rcall	escKlammer
-								ldi		argVL,'3'
-								rjmp	setBGColor1
+setFGRed:			push	argVL
+				ldi		argVL,RED
+				rjmp	setFGGreen0
+setFGWhite:			push	argVL
+				ldi		argVL,WHITE
+				rjmp	setFGGreen0
+
+setFGColor:			push	argVL				;Fontfarbe setzen
+				rcall	escKlammer
+				ldi		argVL,'3'
+				rjmp	setBGColor1
 								
-	
 // BackGround:
 // argVL=0 - rosa BG
 // argVL=1 - blauer BG
@@ -215,17 +225,17 @@ setFGColor:					push	argVL				;Fontfarbe setzen
 // argVL=4 - grüner BG
 // argVL=5 - schwarzer BG 
 ; setzt die Hintergrundfarbe, alle danach geschriebenen Zeichen haben diese Farbe als Hintergrund
-setBGColor:					push 	argVL
-								rcall	escKlammer
-								ldi		argVL,'4'
-setBGColor1:					rcall 	conOut
-								pop	argVL
-								rcall 	conOut
-								push	argVL
-								ldi		argVL,'m'
-								rcall	conOut
-								pop	argVL
-								ret
+setBGColor:		push 	argVL
+			rcall	escKlammer
+			ldi	argVL,'4'
+setBGColor1:		rcall 	conOut
+			pop	argVL
+			rcall 	conOut
+			push	argVL
+			ldi	argVL,'m'
+			rcall	conOut
+			pop	argVL
+			ret
 /*
 // autor:  			Christian Schmidt, Mathias Boehme
 // date of creation: 		09.03.2006
