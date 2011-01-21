@@ -2,10 +2,7 @@
 * HWR-Berlin, Fachbereich Berufsakademie, Fachrichtung Informatik
 * See the file "license.terms" for information on usage and redistribution of this file.
 */
-/*
-* HWR-Berlin, Fachbereich Berufsakademie, Fachrichtung Informatik
-* See the file "license.terms" for information on usage and redistribution of this file.
-*/
+
 /*	still a simulator for atmaga128
 	inspired by  Z80-dis from Petr Kulhavy http://wwwhomes.uni-bielefeld.de/achim/z80-asm.html
 
