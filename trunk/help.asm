@@ -11,9 +11,9 @@
 // used subroutines:		outFlashText
 // changelog
 
-.global	showAuthors
+//.global	showAuthors
 .global	showHelp
-
+/*
 showAuthors:	rcall	outFlashText
 .string		"\r\n\
 		Funktion________________________Autoren_________________Firma\r\n\
@@ -29,7 +29,7 @@ showAuthors:	rcall	outFlashText
 		Register-routines\t\tRaik Guelow (HMI), Robert Janisch (BSP) 2009"
 	.align 1		
 		ret
-
+*/
 // autor:  			Christian Schmidt									;###   Help   ### 
 // date of creation: 		08.03.2006
 // date of last modification	08.03.2006
