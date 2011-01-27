@@ -11,10 +11,15 @@
 // used subroutines:		outFlashText
 // changelog
 
-//.global	showAuthors
+.global	showAuthors
 .global	showHelp
-/*
+
 showAuthors:	rcall	outFlashText
+.string		"\r\n students Berufsakademie Berlin (germany) \r\n\
+		of informatics (microprocessor techique, embedded systems).\r\n\
+		Sorry, not enough space for name list, see file \"help.asm\"\r\n\
+		in the bamo128 directory"
+/*
 .string		"\r\n\
 		Funktion________________________Autoren_________________Firma\r\n\
 		E/A Routinen\t\t\tMarek Mueller (ib-bank-systems)\r\n\
@@ -27,9 +32,10 @@ showAuthors:	rcall	outFlashText
 		EEPROM routines\t\t\tMax Dubiel (HMI)\r\n\
 		Flash anzeigen\t\t\tTilo Kussatz (DeTeWe)\r\n\
 		Register-routines\t\tRaik Guelow (HMI), Robert Janisch (BSP) 2009"
-	.align 1		
-		ret
 */
+.align 1		
+		ret
+
 // autor:  			Christian Schmidt									;###   Help   ### 
 // date of creation: 		08.03.2006
 // date of last modification	08.03.2006
