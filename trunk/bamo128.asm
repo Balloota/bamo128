@@ -75,7 +75,11 @@ JToutFlashText:		jmp	outFlashText		// BOOTSTART+12
 			jmp	switchCase		// BOOTSTART+20
 			jmp	testHex			// BOOTSTART+22
 			jmp	hex2Ascii			// BOOTSTART+24
+#ifndef STK500PROTOCOLUPLOADFLASH
 			jmp	loadInSRam		// BOOTSTART+26
+#else
+			jmp	0			// BOOTSTART+26
+#endif
 			jmp	byteConOut		// BOOTSTART+28
 			jmp	asciiConOut		// BOOTSTART+30
 JTlfcrConOut:		jmp	lfcrConOut			// BOOTSTART+32
