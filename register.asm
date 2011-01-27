@@ -27,7 +27,7 @@
 .global		ShowRegister
 .global		showHeadLine
 
-showHeadLine:	call	setFGBlue			; Farbe setzen
+showHeadLine:	rcall	setFGBlue			; Farbe setzen
 		rcall	outFlashText
 .string	"\r\nPC   Code Mnemonic     ITHSVNZCE SP   X-26 Y-28 Z-30 R:16 17 18 19 20 21 22 23 24 25\r\n"
 .align 1	
@@ -53,12 +53,12 @@ showReg01:	rcall	showHeadLine
 showReg0:	
 showReg4:	rcall	storeInBuffer		; cpu in buf
 		rcall	printBuffer		; print buf		
-showReg1:	call	crConOut		; carriage return
+showReg1:	rcall	crConOut		; carriage return
 		ldi	argVL, SHOWREGBUFSTARTPOS	;set the cursor to first editable position -> r24
-		call	setCursorXRight
+		rcall	setCursorXRight
 		ldi	YL, lo8(RZEICHENBUFFER+SHOWREGBUFSTARTPOS)		;initalize Position
 		ldi	YH, hi8(RZEICHENBUFFER+SHOWREGBUFSTARTPOS)	; 	Y editable buf pos
-showReg2:	call	setFGRed
+showReg2:	rcall	setFGRed
 		rcall	conControlIn	; get char
 		cpi	argVL,0x21
 		brlt	showReg3	; control or space
