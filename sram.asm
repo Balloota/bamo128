@@ -260,6 +260,7 @@ setSRamByte3:		subi		YL,lo8(-REG)	// write it in monram
 			sbci		YH,hi8(-REG)
 			rjmp		setSRamEnd   //bh
 
+#ifndef STK500PROTOCOLUPLOADFLASH
 uploadendS2:		ldi	argVL,0x5
 			rcall	serOut
 						clr	R24
@@ -344,3 +345,4 @@ upLoadEnd:				pop	ZH
 							pop	YL
 							ret
 	
+#endif
