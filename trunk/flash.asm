@@ -18,6 +18,9 @@
 .global	getFlashByte
 .global prepareUpLoadFlash
 .global prepareUpLoad
+.global upLoadEepromAddress
+.global upLoadFlashAddress
+.global upLoadSramAddress
 
 // author:  			Tilo Kussatz 										;###   FLASH   ### 
 // date of creation: 		06.03.2006
@@ -223,17 +226,24 @@ uploaderror:		ldi		argVL,0x5
 			rjmp	mainLoop
 
 #ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
+upLoadEepromAddress:	ldi	argVH,'E'
+			rjmp	prepareUpLoad
+upLoadSramAddress:	ldi	argVH,'S'	// assume it is stk500v1 compatible	
+			rjmp	prepareUpLoad
+upLoadFlashAddress:			
 prepareUpLoadFlash:	// after reset
+			// with bamo-w-command
+			ldi	argVH,'F'
 			// rcall	stopTimer1
-prepareUpLoad:		// with bamo-w-command
+prepareUpLoad:		
 prepareBootLoading0:	ldi	YL,lo8(pm(prepareBootLoading0))
 			ldi	YH,hi8(pm(prepareBootLoading0))
 			push	YL
 			push	YH
 
-prepareBootLoading2:	rcall	waitForKeyStroke
+prepareBootLoading2:	/*rcall	waitForKeyStroke
 			sbrs	argVL,0
-			rjmp	mainLoop
+			rjmp	mainLoop*/ // exit with 'Q'-command
 prepareBootLoading1:rcall	conIn
 		rcall	switchCase
 		.byte 	'd'	
