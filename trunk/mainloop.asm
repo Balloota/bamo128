@@ -83,7 +83,7 @@ mainLoop:	cli
 		ldi	ZL,lo8(pm(mainLoop))
 //		rcall	startTimer1			// sei also milliSec Timer with interrupt
 // uncomment this above, if you understand avr interrupt handling
-// you can use the millisec timer 1 and step timer 0 with arduino also -> see arduinoAndBamo128Interrupts.txt
+// you can use the millisec timer 1 and step timer 0 with arduino applications also -> see arduinoAndBamo128Interrupts.txt
 		push	ZL
 		push	ZH	; return mainLoop on stack
 		rcall	JTsetFGBlack
@@ -100,28 +100,36 @@ mainLoop6:	rcall	conIn
 		sts	SUPPRESSHEADLINE,argVL	; lfcr -> suppress headline r-command
 		breq	mainLoop5
 		clt
+#ifndef	STK500PROTOCOLUPLOADFLASH
 		cpi	argVL,'w'
 		breq	mainLoop4
 		cpi	argVL,'W'
 		breq	mainLoop4
+#endif
 		sts	LASTCOMMAND,argVL
 mainLoop5:	lds	argVL,LASTCOMMAND
 		rcall	conOut
 		rcall	JTspaceConOut
-mainLoop4:	call	switchCase
+mainLoop4:	rcall	switchCase
 		.byte	'm'
 		.word	pm(sRamDump)
 #ifdef	STK500PROTOCOLUPLOADFLASH
 		.byte	'w'
 		.word	pm(foreEver)	// nothing to do , wait for reset from minikermit
+		.byte	'W'
+		.word	pm(upLoadFlashAddress)
+		.byte	'E'
+		.word	pm(upLoadEepromAddress)
+		.byte	'S'
+		.word	pm(upLoadSramAddress)
 #else
 		.byte	'w'
 		.word	pm(upLoadFlash)	// upload with bamo128 - command
 		.byte	'j'
 		.word	pm(upLoadFlashWithOffset)
-#endif
 		.byte	'W'
 		.word	pm(upLoadSRam)
+#endif
 		.byte	'r'
 		.word	pm(showRegister)
 		.byte	'R'
@@ -134,8 +142,8 @@ mainLoop4:	call	switchCase
 		.word	pm(execute)
 		.byte	'b'
 		.word	pm(break)
-//		.byte	'a'
-//		.word	pm(showAuthors)
+		.byte	'a'
+		.word	pm(showAuthors)
 		.byte	'e'
 		.word	pm(eePromDump)
 		.byte	'h'
@@ -150,7 +158,7 @@ mainLoop4:	call	switchCase
 		.byte	0					; default
 		.word	pm(noInstr)
 .align 1
-noInstr:	call	outFlashText
+noInstr:	rcall	outFlashText
 .string	"\r\nPress h for help..."
 .align 1			
 		ret
