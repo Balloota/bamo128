@@ -21,7 +21,7 @@
 /* define various device id's */
 /* manufacturer byte is always the same */
 #define SIG1	0x1E	// Yep, Atmel is the only manufacturer of AVR micros.  Single source :(
-#define __AVR_ATmega1280__
+// built in #define __AVR_ATmega1280__
 
 #ifdef __AVR_ATmega1280__
 #define SIG2		0x97
@@ -150,16 +150,23 @@ writeData0:		rcall	conIn
 			brne	byteResponse2	// ret
 			ldi	YL,lo8(WRITEBUFFER)
 			ldi	YH,hi8(WRITEBUFFER)			
-			cpi	argVH,'E'
-			brne	writeData1	// write flash
-writeData2:		ld	argVL,Y+	// write eeprom
+			cpi	argVH,'F'
+			breq	writeFlash	// write flash
+			cpi	argVH,'S'
+			breq	writeSram
+writeEeprom:		ld	argVL,Y+	// write eeprom
 			rcall	setEEPromByte
 			adiw	ZL,1
 			sbiw	XL,1
-			brne	writeData2
+			brne	writeEeprom
 			rjmp	nothingResponse3
-			//Y-> write buffer, Z -> flash address  X -> length
-writeData1:		ldi	r16,0
+writeSram:		ld	argVL,Y+	// write eeprom
+			st	Z+,argVL
+			sbiw	XL,1
+			brne	writeSram
+			rjmp	nothingResponse3			
+//Y-> write buffer, Z -> flash address  X -> length
+writeFlash:		ldi	r16,0
 			andi	ZL,PAGE_SIZE_MASK	// all other make not sense
 			add	ZL,ZL			// burn full pages !!
 			adc	ZH,ZH
@@ -210,7 +217,7 @@ readData:		rcall	conIn		// 't'     length is big endian and is in bytes ???
 			brne	requestProgrammerID0	// ret
 			ldi	argVL,0x14
 			ldi	r16,0
-			call	conOut
+			rcall	conOut
 			movw	ZL,r20
 			add	ZL,ZL
 			adc	ZH,ZH
@@ -256,6 +263,6 @@ getSignature:		rcall	conIn			// 'u'
 			rjmp	nothingResponse5
 #endif
 // avrdude -pm1280 -D -Uflash:w:Blink.bin:a -c stk500v1 -P/dev/ttyUSB0 -V -b57600
-// das geht mit arduino bootloader
+// das geht mit arduino bootloader (weil ohne int??)
 // avrdude -pm1280 -D -Uflash:w:Blink.bin:a -carduino -P/dev/ttyUSB0 -V -b57600
 // das geht mit bamo128/ wegen DTR oder so bit
