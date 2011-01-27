@@ -101,7 +101,7 @@ conControlEnd:	ret
 waitForKeyStroke: push	YL
 		push	YH
 		ldi	argVL,0
-		ldi	argVH,4//128//32//8//64//2 // adjust it
+		ldi	argVH,16//128//32//8//64//2 // adjust it
 		ldi	YL,0
 		ldi	YH,0
 waitForKeyStroke1: rcall conStat
