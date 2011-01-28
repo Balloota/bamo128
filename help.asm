@@ -15,10 +15,10 @@
 .global	showHelp
 
 showAuthors:	rcall	outFlashText
-.string		"\r\n students Berufsakademie Berlin (germany) \r\n\
-		of informatics (microprocessor techique, embedded systems).\r\n\
-		Sorry, not enough space for name list, see file \"help.asm\"\r\n\
-		in the bamo128 directory"
+.string		"\r\n\tStudents Berufsakademie Berlin (germany) \r\n\
+	of informatics (microprocessor techinque, embedded systems).\r\n\
+	Sorry, not enough space for name list, see file \"help.asm\"\r\n\
+	in the bamo128 directory."
 /*
 .string		"\r\n\
 		Funktion________________________Autoren_________________Firma\r\n\
@@ -58,8 +58,10 @@ showHelp:	rcall	outFlashText
 <b>\t\tBreakpoints display/modify\r\n\
 <r>\t\tRegister display/modify\r\n\
 <c> ss,se,ee,es,sf,fs: sta enda desta copy from/to sram,eeprom flash\r\n\
-<w>\t\tuploading a cob-file to the charonII from PC\r\n\
-<j> [FADDR}\twrite pages in flash\r\n\
+<w>\t\tuploading a bin file from pc in flash\r\n\
+<W>\t\tuploading in flash at address\r\n\
+<E>\t\tuploading in eeprom at address\r\n\
+<S>\t\tuploading in sram at address\r\n\
 <u> [STA]\tdisassmble\r\n"
 .align 1		
 		ret
