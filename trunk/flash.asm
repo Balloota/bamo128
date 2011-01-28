@@ -228,7 +228,7 @@ uploaderror:		ldi		argVL,0x5
 #ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
 upLoadEepromAddress:	ldi	argVH,'E'
 			rjmp	prepareUpLoad
-upLoadSramAddress:	ldi	argVH,'S'	// assume it is stk500v1 compatible	
+upLoadSramAddress:	ldi	argVH,'S'	// assume it is stk500v1 compatible
 			rjmp	prepareUpLoad
 upLoadFlashAddress:			
 prepareUpLoadFlash:	// after reset
