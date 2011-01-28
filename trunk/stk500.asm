@@ -106,7 +106,7 @@ reEnter:		rcall	nothingResponse		// 'Q'
 
 getAdr:			rcall	conIn			// 'U' 
 			mov	r20,argVL		// preserve r20 r21
-			rcall	conIn			// address, little endian. EEPROM in bytes, FLASH in words 
+			rcall	conIn			// address, little endian. EEPROM.SRAM in bytes, FLASH in words 
 			mov	r21,argVL
 			rjmp	nothingResponse		// if (getch()==' ') {putch(0x14);putch(0x10);
 			
@@ -134,7 +134,7 @@ writeData:		rcall	conIn		// 'd'            length is big endian and is in bytes
 			mov	XL,argVL	// preserve X !!
 			movw	ZL,r20
 			rcall	conIn
-			mov	argVH,argVL	// E or not E
+			mov	argVH,argVL	// F,E or S
 			push	XL
 			push	XH		// length in bytes
 			ldi	YL,lo8(WRITEBUFFER)
@@ -143,7 +143,7 @@ writeData0:		rcall	conIn
 			st	Y+,argVL
 			sbiw	XL,1
 			brne	writeData0	// data in buf
-			pop	XH		// length in bytes
+			pop	XH		// restore length in bytes
 			pop	XL
 			rcall	conIn
 			cpi	argVL,' '
@@ -154,13 +154,16 @@ writeData0:		rcall	conIn
 			breq	writeFlash	// write flash
 			cpi	argVH,'S'
 			breq	writeSram
-writeEeprom:		ld	argVL,Y+	// write eeprom
+writeEeprom:		movw	r4,YL	; swap Z Y
+			movw	YL,ZL
+			movw	ZL,r4
+writeEeprom1:		ld	argVL,Z+	// write eeprom
 			rcall	setEEPromByte
-			adiw	ZL,1
+			adiw	YL,1
 			sbiw	XL,1
-			brne	writeEeprom
+			brne	writeEeprom1
 			rjmp	nothingResponse3
-writeSram:		ld	argVL,Y+	// write eeprom
+writeSram:		ld	argVL,Y+	// write sram
 			st	Z+,argVL
 			sbiw	XL,1
 			brne	writeSram
