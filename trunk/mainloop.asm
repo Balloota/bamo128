@@ -100,12 +100,14 @@ mainLoop6:	rcall	conIn
 		sts	SUPPRESSHEADLINE,argVL	; lfcr -> suppress headline r-command
 		breq	mainLoop5
 		clt
-#ifndef	STK500PROTOCOLUPLOADFLASH
 		cpi	argVL,'w'
 		breq	mainLoop4
 		cpi	argVL,'W'
 		breq	mainLoop4
-#endif
+		cpi	argVL,'S'
+		breq	mainLoop4
+		cpi	argVL,'E'
+		breq	mainLoop4
 		sts	LASTCOMMAND,argVL
 mainLoop5:	lds	argVL,LASTCOMMAND
 		rcall	conOut
