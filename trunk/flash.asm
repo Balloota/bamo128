@@ -133,6 +133,8 @@ flashMatrixLoop:		LDI			argVL,GREEN
 						rcall		lfcrConOut				; springe zu Anfang nächste Zeile
 						dec		loop
 			brne		flashMatrixLoop
+			rjmp	flashMatrixEnd
+
 flashMatrixEnd:		pop		argVH
 						pop		argVL
 						pop		YH
@@ -226,13 +228,8 @@ uploaderror:		ldi		argVL,0x5
 			rjmp	mainLoop
 
 #ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
-upLoadEepromAddress:	ldi	argVH,'E'
-			rjmp	prepareUpLoad
-upLoadSramAddress:	ldi	argVH,'S'	// assume it is stk500v1 compatible
-			rjmp	prepareUpLoad
-upLoadFlashAddress:			
 prepareUpLoadFlash:	// after reset
-			// with bamo-w-command
+			// and  bamo-w-command
 			ldi	argVH,'F'
 			// rcall	stopTimer1
 prepareUpLoad:		
