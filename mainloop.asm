@@ -100,13 +100,18 @@ mainLoop6:	rcall	conIn
 		sts	SUPPRESSHEADLINE,argVL	; lfcr -> suppress headline r-command
 		breq	mainLoop5
 		clt
-		cpi	argVL,'w'
+		cpi	argVL,'w'	// upload flash at address 0
+		brne	mainLoop9
+		ldi	argVL,'F'
+mainLoop9:	cpi	argVL,'W'	// upload flash at address
+		brne	mainLoop8
+		ldi	argVL,'F'
+mainLoop8:	mov	argVH,argVL
+		cpi	argVL,'F'	// upload flash
 		breq	mainLoop4
-		cpi	argVL,'W'
+		cpi	argVL,'S'	// upload sram
 		breq	mainLoop4
-		cpi	argVL,'S'
-		breq	mainLoop4
-		cpi	argVL,'E'
+		cpi	argVL,'E'	// upload eeprom
 		breq	mainLoop4
 		sts	LASTCOMMAND,argVL
 mainLoop5:	lds	argVL,LASTCOMMAND
@@ -116,14 +121,12 @@ mainLoop4:	rcall	switchCase
 		.byte	'm'
 		.word	pm(sRamDump)
 #ifdef	STK500PROTOCOLUPLOADFLASH
-		.byte	'w'
-		.word	pm(foreEver)	// nothing to do , wait for reset from minikermit
-		.byte	'W'
-		.word	pm(upLoadFlashAddress)
+		.byte	'F'		// upload flash at address (0)
+		.word	pm(prepareUpLoad)
 		.byte	'E'
-		.word	pm(upLoadEepromAddress)
+		.word	pm(prepareUpLoad)
 		.byte	'S'
-		.word	pm(upLoadSramAddress)
+		.word	pm(prepareUpLoad)
 #else
 		.byte	'w'
 		.word	pm(upLoadFlash)	// upload with bamo128 - command
@@ -164,6 +167,8 @@ noInstr:	rcall	outFlashText
 .string	"\r\nPress h for help..."
 .align 1			
 		ret
+/*
 #ifdef STK500PROTOCOLUPLOADFLASH
 foreEver:	rjmp	foreEver	// wait for reset!!
 #endif
+*/
