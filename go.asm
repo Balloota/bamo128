@@ -55,7 +55,7 @@ go4:		ld	R27,-Y
 		st	-Z,R27
 		or	ZL,ZL
 		brne	go4				; R0-R26 laden
-#ifndef DUEMILANOVE
+#ifndef ARDUINODUEMILANOVE
 		lds	R27,USERRAMPZ
 		out	_SFR_IO_ADDR(RAMPZ),R27
 #endif
@@ -105,7 +105,7 @@ saveCPU:						cli
 							sts		REG+29,R29
 							sts		REG+30,R30
 		sts		REG+31,R31			; R27 -R31 retten
-#ifndef DUEMILANOVE
+#ifndef ARDUINODUEMILANOVE
 							in		R27,_SFR_IO_ADDR(RAMPZ)
 #endif
 							sts		USERRAMPZ,R27
