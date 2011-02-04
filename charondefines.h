@@ -25,7 +25,6 @@
 
 #define		stepIntTimeConst		0x0a
 
-.equ		bdteiler,(CPUFREQUENZ/(16*BAMOBAUDRATE))	; Baud-Divider
 
 // correct it for avr-as
 .macro input
@@ -83,7 +82,7 @@ serOut1:	lds	argVL,UCSR0A	$ \
 
 #define STARTMILLISECTIMER	\
 		ldi	argVL,1+(1<<WGM12)		/*	clock divider 1 (sysclock), ctc-mode*/ $ \
-		out	_SFR_IO_ADDR(TCCR1B),argVL		/* system clock divided by 1*/	$ \
+	out	_SFR_IO_ADDR(TCCR1B),argVL		/* system clock divided by 1*/	$ \
 		in	argVL,_SFR_IO_ADDR(TIMSK) $ \
 		sbr	argVL,(1<<OCIE1A)	$ \
 		out	_SFR_IO_ADDR(TIMSK),argVL
