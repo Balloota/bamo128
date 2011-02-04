@@ -5,23 +5,22 @@
 
 Bamo128
 Bamo128 is a resident monitor program for AVR8 microcontrollers. The monitor is written
-in assembler (GNU toolchain: avr-as) and communicates with the host-PC over a serial interface
-with an appropriate terminal program (advantageously minikermit from cs.ba-berlin.de).
+in assembler (GNU toolchain: avr-as) in a linux environment and communicates with the host-PC over a serial interface
+with an appropriate terminal program (advantageously arduinokermit from minikermit.googlecode.com).
 With bamo128 you can:
 - visit/modify/copy the different memories in an AVR8 microcontroller
 - load in flash (with bootloader over serial or usb port)  and execute (also in step-mode
   and with break-points) asm- and C- programs
 - visit and modify cpu-state (flags, regs,...)
 - disassemble flash instructions.
-Useful monitor functions can be linked to external asm- C-programs with a linker script.
+Useful monitor functions can be linked to external asm- and C-programs with a linker script.
 For this functionality Bamo128 needs 4 KWords (8K Bytes) of flash memory advantageously
 in the boot section of the microcontroller and about 256 bytes ram for monitor variables (MONRAM). Bamo128 writes the ISR jump table at flash address 0000.
-Currently we use bamo128 at boards with the atmega128 (CharonII with 32K external RAM and the Mica2 without external RAM).
-
-The version bamo128V06 can be used with the ArduinoMega-Bord (atmega1280) also.
+Currently we use bamo128 at boards with the atmega128 (CharonII with 32K external RAM,
+the Mica2 without external RAM), the ArduinoMega-Bord (atmega1280) and the ArduinoDuemilanove-Board (atmega328p) also.
 
 You can simple burn the monitor in a naked microcontroller with your programmer.
-We use for the CharonII the STK500-programmer and usip and for the ArduinoMega the programmer avrISPmkII and avrdude 
+We use for the CharonII the STK500-programmer and usip and for the ArduinoMega the programmer avrISPmkII and avrdude.
 
 From command line in linux type for the ArduinoMega board:
 $> make fuses am		
@@ -29,24 +28,25 @@ writes fuses ( 4Kword boot section, start after reset in boot section).
 $> make all am
 generates the hex file bamo128.hex and burns the monitor file  in the microcontroller atmega1280 on the ArduinoMega board
 You can now with 
-$> ./minikermit
-or other termibnal programs communicate with the monitor from the host-PC.
-An cross compiled program (bin format) is uploaded with the monitor w-command
-in cooperation with the terminal program minikermit (cs.ba-berlin.de).
+$> ./arduinokermit
+or other terminal programs communicate with the monitor from the host-PC.
+An cross compiled program (bin format) is uploaded with the monitor w (and W) -command
+in cooperation with the terminal program arduinokermit (minikermit.googlecode.com).
+Arduinokermit stands for a terminal program with a stk500v1 compatible bootloader and is a version of minikermit.
 
-$>./minikermit		# compile minikermit with 115200 and your serial lines
+$>./arduinokermit		# compile arduinokermit with 57600 (115200) and your serial lines
 
 that is the coldstart greeting line and the prompt af bamo128:
-    ___________________BAMo128 Version:0.06 _________________
+    ___________________BAMo128 Version:0.08 _________________
      from students of the BA Berlin written for the ArduinoMega
 
     BAMo128 #>
 
 now type 'w':
-    BAMo128 #>name of cob (bin) -file for uploading:
+    BAMo128 #>name of bin -file for uploading:
 
 and type the bin-file name of your program:
-    BAMo128 #>name of cob (bin) -file for uploading:        my.bin
+    BAMo128 #>name of bin -file for uploading:        my.bin
     page:   1 with af bytes written (last page)  filelength: 01af
     BAMo128 #> 
 
@@ -54,8 +54,16 @@ you can start now the program with g startaddress, addresses are word addresses.
 If necessary you can set registers/flags/io-ports/memory before program-start:
     BAMo128 #> g 80
 
-If you finish your application asm-program with "ret" (for C-programs modify the exit function), you get back to the monitor and you can now inspect memory and registers of cpu with monitor commands.
+Bamo128 supports external programming software with stk500V1-protocol also (arduino development environment and avrdude).
+You can replace the 2K word arduino bootloader on arduino boards by bamo128 and can load (and run)  compiled sketches
+from the arduino development environment.
+Bamo128 works with interrupts ('s'- step mode and millisec -timer). Therefore the application program must fill the interrupt
+vector table with proper isr-jumps (see arduinoAndBamo128Interrupts.txt),if you want to use this features.
+
+If you finish your application asm-program with "ret" (for C-programs modify the exit function), you come back to the monitor
+and you can now inspect (and modify) memory and registers of cpu with monitor commands ('r','m','f','e'..).
     BAMo128 #> u 80
 disassembles the program.
     BAMo128 #> s 80
 allows debugging in step mode.
+Type 'h' for all commands of the monitor.
