@@ -13,7 +13,7 @@
 
 .global	showAuthors
 .global	showHelp
-
+//.section text1
 showAuthors:	rcall	outFlashText
 .string		"\r\n\tStudents Berufsakademie Berlin (germany) \r\n\
 	of informatics (microprocessor techinque, embedded systems).\r\n\
