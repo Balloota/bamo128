@@ -24,11 +24,6 @@
 
 #define		stepIntTimeConst		0x6
 
-#if BAMOBAUDRATE == 57600
-.equ		bdteiler,(CPUFREQUENZ/(16*BAMOBAUDRATE)-1)	; Baud-Divider
-#else
-.equ		bdteiler,(CPUFREQUENZ/(16*BAMOBAUDRATE))	; Baud-Divider
-#endif
 
 #define ENABLEEXTERNALRAM
 
