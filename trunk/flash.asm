@@ -54,10 +54,8 @@ flashDump:			rcall		conInADRSupWSTestCR
 						mov		SL,YL
 						andi		SL, 0b11111000		; auf einen xxx8 - Wert geglaettet
 						mov		SH,YH	
-				rjmp	skippy
-				jmp	BOOTSTART	; ist for devices witk 2K word bott section, make it better
-skippy:				ldi		argVL, BLACK		
-				rcall		setBGColor			; Hintergrund auf schwarz setzen
+						ldi		argVL, BLACK		
+						rcall		setBGColor			; Hintergrund auf schwarz setzen
 flashLoop:					push		YL
 						push		YH
 						mov		YL,SL
@@ -134,7 +132,8 @@ flashMatrixLoop:		LDI			argVL,GREEN
 						dec		loop
 			brne		flashMatrixLoop
 			rjmp	flashMatrixEnd
-
+//.org 0xf800
+//.section text1
 flashMatrixEnd:		pop		argVH
 						pop		argVL
 						pop		YH
@@ -143,7 +142,14 @@ flashMatrixEnd:		pop		argVH
 						push		YH
 						push		argVL
 						push		argVH
-						mov		argVL,YL		;	set Cursor
+
+
+// here starts boot section, make it better
+						rjmp	skippy
+.word 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+						jmp	BOOTSTART	// 0x3800 ist here!!
+
+skippy:						mov		argVL,YL		;	set Cursor
 						mov		argVH,YH
 						sub		argVL,SL
 						sbc		argVH,SH
@@ -228,19 +234,17 @@ uploaderror:		ldi		argVL,0x5
 			rjmp	mainLoop
 
 #ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
-prepareUpLoadFlash:	// after reset
+prepareUpLoadFlash:	// after reset (sw-reset from external programmer)
 			// and  bamo-w-command
 			ldi	argVH,'F'
-			// rcall	stopTimer1
+			// rcall	stopTimer1 // uncomment, if your application program has an entry in ivtab for timer 1
 prepareUpLoad:		
 prepareBootLoading0:	ldi	YL,lo8(pm(prepareBootLoading0))
 			ldi	YH,hi8(pm(prepareBootLoading0))
 			push	YL
 			push	YH
 
-prepareBootLoading2:	/*rcall	waitForKeyStroke
-			sbrs	argVL,0
-			rjmp	mainLoop*/ // exit with 'Q'-command
+prepareBootLoading2:	
 prepareBootLoading1:rcall	conIn
 		rcall	switchCase
 		.byte 	'd'	
@@ -343,8 +347,22 @@ uploadend:	rcall	conInAdrSupWS
 							
 
 /*****************************************************************/
-
-
+#ifdef ARDUINODUEMILANOVE
+Do_spm:; check for previous SPM complete
+Wait_spm:	in	argVH,_SFR_IO_ADDR(SPMCSR)
+		sbrc argVH, SELFPRGEN
+		rjmp Wait_spm
+; input: spmcrval determines SPM action
+; disable interrupts if enabled, store status
+		in	argVH,_SFR_IO_ADDR(SREG)
+		cli	; check that no EEPROM write access is present
+Wait_ee:	sbic _SFR_IO_ADDR(EECR), EEPE
+		rjmp Wait_ee	; SPM timed sequence
+		out _SFR_IO_ADDR(SPMCSR), argVL
+		spm	; restore SREG (to enable interrupts if originally enabled)
+		out _SFR_IO_ADDR(SREG), argVH
+		ret
+#else
 Do_spm:		in	argVH, _SFR_IO_ADDR(SREG)
 		push	argVH
 		cli
@@ -371,6 +389,7 @@ waitEE:		sbic	_SFR_IO_ADDR(EECR),EEPE
 		pop	argVH
 		out	_SFR_IO_ADDR(SREG),argVH
 		ret
+#endif
 
 // ZH,ZL modified
 switchCase:		pop	ZH
