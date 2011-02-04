@@ -4,6 +4,7 @@
 */
 #include	<avr/io.h>
 #include "defines.asm"
+#include "boarddefines.h"
 // autor: 			Ines Moosdorf
 // date of creation:		07.03.2006
 // date of last modification: 	10.03.2006
@@ -18,7 +19,7 @@
 
 .global copy
 .global uploadwrite
-
+//.section text1
 copy:			rcall	echo
 			rcall	switchCase
 			.byte	's'
@@ -187,9 +188,17 @@ CopyRamToTxt:	clr	argVL
 		LSL	ZL
 		ROL	ZH				; shift Z to bytes Z0==0
 		push	ZL				; save byte in page
+#ifdef ARDUINODUEMILANOVE
+		ldi	argVL,(1<<PGERS) | (1<<SELFPRGEN)
+#else
 		ldi 	argVL, (1<<PGERS) | (1<<SPMEN)	; page erase
+#endif
 		rcall	Do_spm
+#ifdef ARDUINODUEMILANOVE
+		ldi	argVL,(1<<RWWSRE) | (1<<SELFPRGEN)
+#else
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
+#endif
 		rcall	Do_spm
 Wrloop:		push	ZH
 		push	ZL
@@ -201,16 +210,26 @@ Wrloop:		push	ZH
 		adiw	YL,1				; transfer data bytes from RAM to Flash page buffer
 		pop	ZL
 		pop	ZH
-		ldi	argVL, (1<<SPMEN)
+#ifdef ARDUINODUEMILANOVE
+		ldi	argVL,(1<<SELFPRGEN)
+#else
+		ldi	argVL,(1<<SPMEN)	; re-enable the RWW section
+#endif
 		rcall	Do_spm
 		inc	ZL				; next word
 		inc	ZL
 		dec	r15
 		brne	Wrloop
 		pop	ZL
+#ifdef ARDUINODUEMILANOVE
+uploadwrite:	ldi	argVL, (1<<PGWRT) | (1<<SELFPRGEN)	; execute write
+		rcall	Do_spm
+		ldi	argVL, (1<<RWWSRE) | (1<<SELFPRGEN)	; re-enable the RWW section
+#else
 uploadwrite:	ldi	argVL, (1<<PGWRT) | (1<<SPMEN)	; execute write
 		rcall	Do_spm
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
+#endif
 		rcall	Do_spm
 uploadwrite1:	clr	zeroReg
 #ifdef ARDUINOMEGA
@@ -221,7 +240,11 @@ uploadwrite1:	clr	zeroReg
 #endif
 		sbrs	argVL, RWWSB	; If RWWSB is set, the RWW section is not ready yet
 		ret
+#ifdef ARDUINODUEMILANOVE
+		ldi	argVL, (1<<RWWSRE) | (1<<SELFPRGEN)	; re-enable the RWW section
+#else
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
+#endif
 		rcall	Do_spm
 		rjmp	uploadwrite1
 
