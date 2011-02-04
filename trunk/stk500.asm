@@ -4,7 +4,7 @@
 */
 /*
  * stk500 protocoll for upload binary data at flash or eeprom
- * can be used as arduino bootloader
+ * bamo128 can be used as arduino bootloader
  * apps start not automatically if no terminal interaction (e.g. terminal-sw minikermit.googlecode.com)
  * (feel free to change this behavior)
  * arduinoMega with atmega1280
@@ -30,11 +30,19 @@
 #define	PAGE_SIZE_MASK	0x80
 #define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
 // mask for last page bits
+#elif __AVR_ATmega128__
+#define SIG2		0x97
+#define SIG3		0x02
+#define PAGE_SIZE	0x80	// 128 words
+#define	PAGE_SIZE_MASK	0x80
+#define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
+// mask for last page bits
 #elif defined __AVR_ATmega328P__
 #define SIG2		0x95
 #define SIG3		0x0F
 #define PAGE_SIZE	0x40	// 64 words
 #define	PAGE_SIZE_MASK	0xC0	// mask for last page bits
+#define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
 #endif
 
 #define	PAGE_SIZE_BYTE	(2*(PAGE_SIZE))		// page size <= 128 !!!
@@ -56,6 +64,7 @@
 .global testing
 .global testBurn
 .global upLoadSim
+//.section text1
 boardCommand:		rcall	conIn			// '@'
 			cpi	argVL,0x85+1
 			brlo	nothingResponse
@@ -152,7 +161,7 @@ writeData0:		rcall	conIn
 			ldi	YH,hi8(WRITEBUFFER)			
 			cpi	argVH,'F'
 			breq	writeFlash	// write flash
-			cpi	argVH,'S'
+			cpi	argVH,'S'	// I dont know. Is it stk500 compatible. But it is useful!!!
 			breq	writeSram
 writeEeprom:		movw	r4,YL	; swap Z Y
 			movw	YL,ZL
@@ -173,7 +182,7 @@ writeFlash:		ldi	r16,0
 			andi	ZL,PAGE_SIZE_MASK	// all other make not sense
 			add	ZL,ZL			// burn full pages !!
 			adc	ZH,ZH
-			adc	r16,r16		// r16,ZH,ZL holds flash byte address
+			adc	r16,r16			// r16,ZH,ZL holds flash byte address
 			ldi	r17,0
 			sbiw	XL,0
 			breq	writeData5	// nothing to burn
@@ -186,25 +195,35 @@ writeData3:		inc	r17		// count pages
 			breq	writeData4	// all other make not sense
 			brcc	writeData3
 writeData4:			// now write pages			
-			out	_SFR_IO_ADDR(RAMPZ),r16	
+			out	_SFR_IO_ADDR(RAMPZ),r16
+#ifdef ARDUINODUEMILANOVE
+			ldi	argVL, (1<<PGERS) |  (1<<SELFPRGEN)	//  Page Erase
+			rcall	Do_spm
+			ldi	argVL, (1<<RWWSRE) |  (1<<SELFPRGEN)	// re-enable the RWW section
+#else
 			ldi	argVL, (1<<PGERS) | (1<<SPMEN)	//  Page Erase
 			rcall	Do_spm
-			ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	// re-enable the RWW section
+			ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	// re-enable the RWW section		
+#endif
 			rcall	Do_spm					// transfer data from RAM to Flash page buffer
 			ldi	r18, PAGE_SIZE				// init loop variable
-			push	ZL
-			push	ZH
+			movw	r6,ZL
 writeData6:		ld	r0, Y+
 			ld	r1, Y+
+#ifdef ARDUINODUEMILANOVE
+			ldi	argVL, (1<<SELFPRGEN)
+#else
 			ldi	argVL, (1<<SPMEN)
+#endif
 			rcall	Do_spm
 			adiw	ZL, 2
 			sbci	r16,0					// RAMPZ
 			dec	r18
 			brne	writeData6
-			pop	ZH
-			pop	ZL
+			movw	r8,ZL
+			movw	ZL,r6
 			rcall	uploadwrite
+			movw	ZL,r8
 			dec	r17		// still pages
 			brne	writeData4
 writeData5:		rjmp	nothingResponse3
@@ -267,5 +286,6 @@ getSignature:		rcall	conIn			// 'u'
 #endif
 // avrdude -pm1280 -D -Uflash:w:Blink.bin:a -c stk500v1 -P/dev/ttyUSB0 -V -b57600
 // das geht mit arduino bootloader (weil ohne int??)
-// avrdude -pm1280 -D -Uflash:w:Blink.bin:a -carduino -P/dev/ttyUSB0 -V -b57600
+// aber nicht mit 328p macht er kein reset????
+//./avrdude -pm1280 -D -Uflash:w:Blink.bin:a -carduino -P/dev/ttyUSB0 -V -b57600
 // das geht mit bamo128/ wegen DTR oder so bit
