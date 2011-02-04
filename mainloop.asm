@@ -30,17 +30,13 @@ startClearBreaksLoop:	st	Y+,zeroReg
 			out	_SFR_IO_ADDR(SPL),argVL		; an Stapelzeiger monitor stack
 			ldi	argVH, hi8(STACKMON-1) 		; Unteres Byte
 			out	_SFR_IO_ADDR(SPH),argVH
-#if ARDUINOMEGA && STK500PROTOCOLUPLOADFLASH
+#if ARDUINODUEMILANOVE || ARDUINOMEGA 
 			rcall	waitForKeyStroke
 			sbrc	argVL,0
 			jmp prepareUpLoadFlash			// if key presses immediately after reset jump to upload flash
 #endif
 mainLoop7:		rcall	JToutFlashText					;Ausgabe des StartStrings
-#ifndef TESTVERSION
 .string	"\r_______BAMo128 Version:"
-#else
-.string	"\r_______BAMo128 Test-Version: "
-#endif
 .align 1
 			rcall	JToutFlashText	
 .string			VERSION
@@ -72,6 +68,11 @@ mainLoop7:		rcall	JToutFlashText					;Ausgabe des StartStrings
 .string	"ArduinoMega\r\n"
 .align 1	
 #endif
+#ifdef ARDUINODUEMILANOVE
+			rcall	JToutFlashText
+.string	"ArduinoDuemilanove\r\n"
+.align 1	
+#endif
 ;###############################################################################################
 	;restart after command execution or program end (rjmp mainLoop)
 mainLoop:	cli
@@ -81,7 +82,7 @@ mainLoop:	cli
 		out	_SFR_IO_ADDR(SPH),argVH
 		ldi	ZH,hi8(pm(mainLoop))
 		ldi	ZL,lo8(pm(mainLoop))
-//		rcall	startTimer1			// sei also milliSec Timer with interrupt
+		rcall	startTimer1			// sei also milliSec Timer with interrupt
 // uncomment this above, if you understand avr interrupt handling
 // you can use the millisec timer 1 and step timer 0 with arduino applications also -> see arduinoAndBamo128Interrupts.txt
 		push	ZL
@@ -167,8 +168,3 @@ noInstr:	rcall	outFlashText
 .string	"\r\nPress h for help..."
 .align 1			
 		ret
-/*
-#ifdef STK500PROTOCOLUPLOADFLASH
-foreEver:	rjmp	foreEver	// wait for reset!!
-#endif
-*/
