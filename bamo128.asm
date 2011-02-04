@@ -50,15 +50,12 @@
 .global JTsetBGColor
 .global JTsetFGBlack
 
-#ifndef TESTVERSION 		// real monitor
-// real monitor must be programmed in bootsection of flash
-// testversion you can load in application flash (with the resident "real monitor")
 .org			0,0xff	
 #include	"ivtab.asm"
-#endif //!testversion
+
 .org		BYTES(0x80),0xff	// application program 
 		ret
-// this works in bootsection for devieces with 4 kW boot section
+// this works in bootsection for devices with 4 kW boot section
 .org			BYTES(MONSTART),0xff	// 0x80 or BOOTSECTION (0xF000 in words)
 BOOTSTART:		cli			;  no interrupt when stack is changed
 			rjmp	startMonitor
