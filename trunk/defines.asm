@@ -6,7 +6,7 @@
 #define		__DEFINES__
 
 // Monitordefinitionen
-//#define		VERSION		"0.06"
+//#define		VERSION		"0.08"
 
 
 #define		MONRAMBYTES	0x100
