@@ -26,6 +26,9 @@
 #define		SL		r22
 #define		SH		r23
 #define		SPos 	r18
+
+//.section text1
+
 eePromDump:			rcall			conInADRSupWSTestCR
 						mov		SL,YL
 						andi		SL, 0b11110000		; auf einen xxx0 - Wert geglaettet
