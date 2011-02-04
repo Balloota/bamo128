@@ -5,9 +5,6 @@
 #* See the file "license.terms" for information on usage and redistribution of this file.
 # 
 
-# for development set TESTVERSION to 0x80 (1) instead of 0xf000 (0)
-# step command doesnt work in test version
-VERSION = NOTESTVERSION 
 PROTOCOL = STK500PROTOCOLUPLOADFLASH
 # arduino like, with reset before bootload
 # if not defined use of old holznagel-protocol (not recommended)
@@ -25,13 +22,24 @@ fuses:		writeFusesAM
 all:		burn
 endif
 
+ifeq ($(findstring du,$(MAKECMDGOALS)),du)
+	BOARD = ARDUINODUEMILANOVE
+	MCU =	atmega328p
+du:	
+	@:
+compile:	clean binary
+burn:	 	clean binary upLoadDU
+fuses:		writeFusesDU
+all:		burn
+endif
+
 ifeq ($(findstring xplain,$(MAKECMDGOALS)),xplain)	# not realized yet
 	BOARD = XPLAIN
 	MCU =	atxmega128a1 
 xplain:	
 	@:
-compile:	clean flash
-burn:	 	clean flash upLoadAM
+compile:	clean binary
+burn:	 	clean binary upLoadAM
 fuses:		writeFusesAM
 all:		burn fuses
 endif
@@ -42,27 +50,17 @@ ifeq ($(findstring ch,$(MAKECMDGOALS)),ch)
 	MCU =	atmega128
 ch:
 	@:
-compile:	clean flash
-burn: 		clean flash upLoadCH
+compile:	clean binary
+burn: 		clean binary upLoadCH
 fuses:		writeFusesCH
 all:		burn fuses
 endif
 
-ifeq ($(findstring DU,$(MAKECMDGOALS)),du)
-	BOARD = DUEMILANOVE
-	MCU = atmega328
-	#MCU =	atmega168
-DU:
-	@:
-compile:	clean binary
-upLoad: 	clean binary upLoadDU
-fuses:		writeFusesCH
-endif
 
 #**************************************************************
-OBJECTS	= 	bamo128.o  mainloop.o register.o \
-		go.o   sram.o console.o    disass.o   flash.o  consolecontrol.o \
-		transfer.o eeprom.o help.o stk500.o constants.o
+OBJECTS	= 	bamo128.o mainloop.o go.o register.o \
+		sram.o console.o disass.o flash.o consolecontrol.o \
+		transfer.o eeprom.o stk500.o help.o constants.o
 
 MONITOR	= 	bamo128
 
@@ -80,7 +78,7 @@ TTY		= /dev/ttyUSB0
 #TEXTSEGMENT	= 0x1E000
 #TEXTSEGMENT	= 0x100
 
-# binaries tools in avr32studio !!
+# binary tools in avr32studio !!
 BINDIR	= /opt/cross/as4e-ide/plugins/com.atmel.avr.toolchains.linux.x86*/os/linux/x86_64/bin/
 CC	= $(BINDIR)avr-gcc
 CPP	= $(BINDIR)avr-cpp
@@ -99,10 +97,11 @@ DONE    = @echo Errors: none
 ARCHITECTURE	= avr5
 #--- default assembler flags 
 ASFLAGS   = -Wa,-gstabs -Wa,-ahlms=$(<:.asm=.lst) -Wa,-mmcu=$(MCU) -D$(PROTOCOL) -D$(BOARD)
-#--- default linker flags
-#LDFLAGS   = -Wl,-symbolic -Wl,-Map=$(PROJ).map,--cref,--defsym,__stack=0x1100 -nostartfiles -Ttext=0x1E000 -nodefaultlibs
+#- default linker flags
+#LDFLAGS   = -Wl,-symbolic -Wl,-Map=$(PROJ).map,--cref,--defsym,__stack=0x1100 -nostftfiles -Ttext=0x1E000 -nodefaultlibs
 #LDFLAGS =    -nostartfiles -nodefaultlibs   -Wl,-Ttext=$(TEXTSEGMENT) -Wl,-m$(ARCHITECTURE)  -mmcu=$(MCU)
-LDFLAGS =     -Wl,-m$(ARCHITECTURE)  -mmcu=$(MCU) 
+LDFLAGS =     -Wl,-m$(ARCHITECTURE)  -mmcu=$(MCU)
+#  --section-start=.text1=0x1f004
 #-Wl,--section-start=.diss=0x4000
 #-Wl,--gc-sections
 
@@ -112,16 +111,16 @@ IHEXFORMAT	= ihex
 
 #--- assemble: instructions to create object file from assembler source
 %o : %S
-	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(VERSION) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU)  -c $< -o $@
+	$(CC) -x assembler-with-cpp -D$(BOARD)   -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU)  -c $< -o $@
 
 %o: %c
-	$(CC)  -mmcu=$(MCU)  -D$(BOARD)  -D$(VERSION) -c $< -o $@
+	$(CC)  -mmcu=$(MCU)  -D$(BOARD)  -c $< -o $@
 
 %o : %s
-	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(PROTOCOL) -D$(VERSION) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU) -I$(INCDIR) -c $< -o $@
+	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(PROTOCOL)  -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU) -I$(INCDIR) -c $< -o $@
 
 %o : %asm
-	$(CC) -x assembler-with-cpp -D$(BOARD) -D$(VERSION) -D$(PROTOCOL) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU)   -c $< -o $@
+	$(CC) -x assembler-with-cpp -D$(BOARD)  -D$(PROTOCOL) -gstabs -Wa,-ahlms=$(<:.asm=.lst) -mmcu=$(MCU) -c $< -o $@
 
 #--- create flash file (binary) from elf output file overwrite elf file: result in .cob file
 %elf: %bin
@@ -178,21 +177,32 @@ upLoadMote128:
 
 upLoadAM:
 	$(BIN)     -O binary  $(MONITOR).elf  $(MONITOR).bin
-	sudo avrdude -p m1280 -c avrispmkII -D -Pusb  -V -e -Uflash:w:bamo128.bin:a
+	sudo avrdude -p m1280 -c avrispmkII -D -Pusb  -V -e -Uflash:w:$(MONITOR).bin:a
 	$(DONE)
 
 upLoadDU:
 	$(BIN)     -O binary  $(MONITOR).elf  $(MONITOR).bin
-	avrdude  -p m328P -c avrispmkII -Pusb  -e -Uflash:w:/home/bh/Desktop/repos/bamo128/bamo128.bin:a
+	sudo avrdude  -p m328P -c avrispmkII -Pusb  -e -V -D -Uflash:w:$(MONITOR).bin:a
 	$(DONE)
 
+# 2KW bootsection, start at bootsection
+writeFusesDU:
+	sudo avrdude -p m328p -c avrispmkII  -P usb  -Ulfuse:w:0xff:m
+	sudo avrdude -p m328p -c avrispmkII  -P usb  -Uhfuse:w:0xd8:m
+	sudo avrdude -p m328p -c avrispmkII  -P usb  -Uefuse:w:0x05:m
+
+#2KW bootsection, start at bootsection
+#atmega328_isp: HFUSE = DA
+#atmega328_isp: LFUSE = FF
+#atmega328_isp: EFUSE = 05
 
 #avrdude -p m1280 -c avrispmkII -e -P usb  -Uflash:w:bamo128.hex:i
-
+# 4KW bootsection, start at bootsection
 writeFusesAM:
 	sudo avrdude -p m1280 -c avrispmkII  -P usb  -Ulfuse:w:0xff:m
 	sudo avrdude -p m1280 -c avrispmkII  -P usb  -Uhfuse:w:0xd8:m
 	sudo avrdude -p m1280 -c avrispmkII  -P usb  -Uefuse:w:0xf5:m
+
 
 readFusesCH:
 	$(UISP) -dprog=$(PROGRAMMER) -dserial=$(TTY) -dpart=ATmega128 -dspeed=115200  --rd_fuses
