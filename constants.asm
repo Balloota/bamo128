@@ -6,6 +6,7 @@
 .global iMaskiBits
 .global bamoEnd 
 // sechs sex sechs
+//.section text1
 iString:
 .ascii	"NOP   MOVW rMULS rMULSUrFMUL rFMULSrFMULSUCPC  r"
 .ascii	"SBC  rADD  rCPSE rCP   rSUB  rADC  rAND  rEOR  r"
