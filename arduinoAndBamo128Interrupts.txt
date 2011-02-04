@@ -29,6 +29,6 @@ and you can use e.g. SYSTIMEMILLISEC variable in your application code.
 ISR(SIG_OUTPUT_COMPARE2) __attribute__ ((naked));
 ISR(SIG_OUTPUT_COMPARE2) {asm volatile  (INLINEASM(jmp,saveCPU));}
 
+ /* monitor interrupt for sysclock millisec */
 ISR(SIG_OUTPUT_COMPARE1A) __attribute__ ((naked));
 ISR(SIG_OUTPUT_COMPARE1A) {asm volatile  (INLINEASM(jmp,mySysClock));}
- /* monitor for sysclock millisec */
