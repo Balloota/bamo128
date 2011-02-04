@@ -42,6 +42,7 @@
 .global	setBGColor
 .global	getCursorXY
 
+//.section text1
 //beep:							ldi		argVL,BELL
 //								rjmp	conOut
 home:							rcall 	escKlammer
