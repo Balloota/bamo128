@@ -1,34 +1,42 @@
-The resident monitor bamo128 allows to start application programs with the go ('g')->command.
-Applications can use monitor functions and variables.
+The resident monitor bamo128 allows to burn and start application programs with the go ('g')->command.
+Applications are compiled, linked and loaded  independently at address 0. 
 If you dont link your application at the monitor bamo128 you can not use the step('s')- and break('x')- command 
-and you must uncomment in mainloop.asm the line:
-rcall startTimer1
-because timer1 works with interupts and your application at flash-address 0 overwrites
-the interrupt-vector-table in the most cases (if you link the application at address 0). 
+and you must comment in mainloop.asm the line:
+// rcall startTimer1
+because timer1 (milliSeconds) and timer2 (step and break) works with interupts and
+your application at flash-address 0 overwrites the interrupt-vector-table normally. 
 
 But there are possibilities to link application and monitor bamo128.
 One way is to add an appropiate linker script to your application project,
-another add this code bottom to your (arduino) C/C++ project code.
+another add this code bottom to your (arduino) C/C++ project code (sketches).
 Then the compiler inserts the jumps to the interrupt service routines in the application code
 and you can use e.g. SYSTIMEMILLISEC variable in your application code.
+You can use monitor functions and other monitor variables in your application also.
+Look at the jump-table in bamo128.asm for addresses prepared for common use and insert this in the code below.
 
-#define		BYTES(word)	((word)*2)
-#define		STRING(a,b)	#a" "#b
-#define		INLINEASM(a,b)	STRING(a,b)
-#define		LARGEBOOTSTART	0xf000
-#define		BOARDRAMEND	0x2200
-#define		MONSTART	LARGEBOOTSTART
-#define 	MONRAM		(BOARDRAMEND-0x100)
-#define		SYSTIMEMILLISEC	(MONRAM+0x40)
+#define	BYTES(word)	((word)*2)
+#define	STRING(a,b)	#a" "#b
+#define	INLINEASM(a,b)	STRING(a,b)
 
-#define saveCPU		BYTES(LARGEBOOTSTART+62)//Time2Comp	// BOOTSTART+62		
-#define mySysClock      BYTES(LARGEBOOTSTART+56)/* timer1 overflow interrupt */
+#ifdef  __AVR_ATmega1280__		// arduinoMega
+#define	LARGEBOOTSTART	0xf000
+#define	BOARDRAMEND	0x2200
+#define	MONSTART	LARGEBOOTSTART
+#elif __AVR_ATmega328P__		// arduinoDuemilanve
+#define	LARGEBOOTSTART	0x3000
+#define	BOARDRAMEND	0x900
+#define	MONSTART	LARGEBOOTSTART
+#endif	
 
+#define MONRAM		(BOARDRAMEND-0x100)
+#define	SYSTIMEMILLISEC	(MONRAM+0x40)
+#define saveCPU		BYTES(LARGEBOOTSTART+62)	// Time2Comp	// BOOTSTART+62		
+#define mySysClock      BYTES(LARGEBOOTSTART+56)	// timer1 overflow interrupt 
 
 // monitor interrupt für step ...
-ISR(SIG_OUTPUT_COMPARE2) __attribute__ ((naked));
-ISR(SIG_OUTPUT_COMPARE2) {asm volatile  (INLINEASM(jmp,saveCPU));}
+ISR(TIMER2_COMPA_vect) __attribute__ ((naked));
+ISR(TIMER2_COMPA_vect) {asm volatile  (INLINEASM(jmp,saveCPU));}
 
  /* monitor interrupt for sysclock millisec */
-ISR(SIG_OUTPUT_COMPARE1A) __attribute__ ((naked));
-ISR(SIG_OUTPUT_COMPARE1A) {asm volatile  (INLINEASM(jmp,mySysClock));}
+ISR(TIMER1_COMPA_vect) __attribute__ ((naked));
+ISR(TIMER1_COMPA_vect) {asm volatile  (INLINEASM(jmp,mySysClock));}
