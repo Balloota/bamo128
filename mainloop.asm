@@ -82,7 +82,7 @@ mainLoop:	cli
 		out	_SFR_IO_ADDR(SPH),argVH
 		ldi	ZH,hi8(pm(mainLoop))
 		ldi	ZL,lo8(pm(mainLoop))
-		rcall	startTimer1			// sei also milliSec Timer with interrupt
+//		rcall	startTimer1			// sei also milliSec Timer with interrupt
 // uncomment this above, if you understand avr interrupt handling
 // you can use the millisec timer 1 and step timer 0 with arduino applications also -> see arduinoAndBamo128Interrupts.txt
 		push	ZL
