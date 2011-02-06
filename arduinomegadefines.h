@@ -1,3 +1,4 @@
+// built in #define __AVR_ATmega1280__
 
 #define		INTERNALFLASHSTART		0x0000		// words
 #define		INTERNALFLASHLENGTH		0x10000		// 64Kwords
@@ -23,6 +24,12 @@
 #define		LARGEBOOTSTART			0xF000		// words
 
 #define		stepIntTimeConst		0x6
+
+//built in #define SPM_PAGESIZE	0x80			// 128 words
+#define	SPM_PAGESIZE_MASK	0x80		// mask for last page bits
+#define SPM_WRITEBUFFER		0x200		// bytes to be written stored in user sram
+#define SIG2		0x97
+#define SIG3		0x03
 
 
 #define ENABLEEXTERNALRAM
