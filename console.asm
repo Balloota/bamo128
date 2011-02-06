@@ -98,10 +98,10 @@ serStat:	set
 #endif
 conControlEnd:	ret
 
-waitForKeyStroke: push	YL
-		push	YH
+waitForKeyStroke: push	YL		// after reset of arduino board wait for serial in (burn)
+		push	YH		// if nothing coming in got to monitor
 		ldi	argVL,0
-		ldi	argVH,48//128//32//8//64//2 // adjust it
+		ldi	argVH,24//128//32//8//64//2 // adjust it!!!!!!!!!!
 		ldi	YL,0
 		ldi	YH,0
 waitForKeyStroke1: rcall conStat
