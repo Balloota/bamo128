@@ -19,6 +19,11 @@
 #define		BAMOEEWE			EEWE
 #define		BAMOEEMWE			EEMWE
 
+//#define SPM_PAGESIZE	0x80			// 128 words
+#define	SPM_PAGESIZE_MASK	0x80		// mask for last page bits
+#define SPM_WRITEBUFFER		0x200		// bytes to be written stored in user sram
+#define SIG2		0x97
+#define SIG3		0x02
 #define		CPUFREQUENZ			14745000
 
 #define		BAMOBAUDRATE			115200
