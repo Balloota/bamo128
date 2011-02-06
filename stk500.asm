@@ -13,39 +13,6 @@
 #include "boarddefines.h"
 #include "defines.asm"
 
-/* SW_MAJOR and MINOR needs to be updated from time to time to avoid warning message from AVR Studio */
-#define HW_VER	 0x02
-#define SW_MAJOR 0x01
-#define SW_MINOR 0x12
-
-/* define various device id's */
-/* manufacturer byte is always the same */
-#define SIG1	0x1E	// Yep, Atmel is the only manufacturer of AVR micros.  Single source :(
-// built in #define __AVR_ATmega1280__
-
-#ifdef __AVR_ATmega1280__
-#define SIG2		0x97
-#define SIG3		0x03
-#define PAGE_SIZE	0x80	// 128 words
-#define	PAGE_SIZE_MASK	0x80
-#define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
-// mask for last page bits
-#elif __AVR_ATmega128__
-#define SIG2		0x97
-#define SIG3		0x02
-#define PAGE_SIZE	0x80	// 128 words
-#define	PAGE_SIZE_MASK	0x80
-#define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
-// mask for last page bits
-#elif defined __AVR_ATmega328P__
-#define SIG2		0x95
-#define SIG3		0x0F
-#define PAGE_SIZE	0x40	// 64 words
-#define	PAGE_SIZE_MASK	0xC0	// mask for last page bits
-#define WRITEBUFFER	0x200	// bytes to be written stored in user sdram
-#endif
-
-#define	PAGE_SIZE_BYTE	(2*(PAGE_SIZE))		// page size <= 128 !!!
 
 #ifdef STK500PROTOCOLUPLOADFLASH
 .global nothingResponse
@@ -64,6 +31,8 @@
 .global testing
 .global testBurn
 .global upLoadSim
+.global writeSpmBlock
+.global writeSpmPage
 //.section text1
 boardCommand:		rcall	conIn			// '@'
 			cpi	argVL,0x85+1
@@ -144,21 +113,19 @@ writeData:		rcall	conIn		// 'd'            length is big endian and is in bytes
 			movw	ZL,r20
 			rcall	conIn
 			mov	argVH,argVL	// F,E or S
-			push	XL
-			push	XH		// length in bytes
-			ldi	YL,lo8(WRITEBUFFER)
-			ldi	YH,hi8(WRITEBUFFER)
+			movw	r4,XL		// length in bytes
+			ldi	YL,lo8(SPM_WRITEBUFFER)
+			ldi	YH,hi8(SPM_WRITEBUFFER)
 writeData0:		rcall	conIn
 			st	Y+,argVL
 			sbiw	XL,1
 			brne	writeData0	// data in buf
-			pop	XH		// restore length in bytes
-			pop	XL
+			movw	XL,r4		// restore length in bytes
 			rcall	conIn
 			cpi	argVL,' '
 			brne	byteResponse2	// ret
-			ldi	YL,lo8(WRITEBUFFER)
-			ldi	YH,hi8(WRITEBUFFER)			
+			ldi	YL,lo8(SPM_WRITEBUFFER)
+			ldi	YH,hi8(SPM_WRITEBUFFER)			
 			cpi	argVH,'F'
 			breq	writeFlash	// write flash
 			cpi	argVH,'S'	// I dont know. Is it stk500 compatible. But it is useful!!!
@@ -178,55 +145,8 @@ writeSram:		ld	argVL,Y+	// write sram
 			brne	writeSram
 			rjmp	nothingResponse3			
 //Y-> write buffer, Z -> flash address  X -> length
-writeFlash:		ldi	r16,0
-			andi	ZL,PAGE_SIZE_MASK	// all other make not sense
-			add	ZL,ZL			// burn full pages !!
-			adc	ZH,ZH
-			adc	r16,r16			// r16,ZH,ZL holds flash byte address
-			ldi	r17,0
-			sbiw	XL,0
-			breq	writeData5	// nothing to burn
-			adiw	XL,1		// even bytes
-			lsr	XH		// %2 length in words
-			ror	XL
-writeData3:		inc	r17		// count pages
-			subi	XL,PAGE_SIZE	// compute pages (and burn pages!!)
-			sbci	XH,0
-			breq	writeData4	// all other make not sense
-			brcc	writeData3
-writeData4:			// now write pages			
-			out	_SFR_IO_ADDR(RAMPZ),r16
-#ifdef ARDUINODUEMILANOVE
-			ldi	argVL, (1<<PGERS) |  (1<<SELFPRGEN)	//  Page Erase
-			rcall	Do_spm
-			ldi	argVL, (1<<RWWSRE) |  (1<<SELFPRGEN)	// re-enable the RWW section
-#else
-			ldi	argVL, (1<<PGERS) | (1<<SPMEN)	//  Page Erase
-			rcall	Do_spm
-			ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	// re-enable the RWW section		
-#endif
-			rcall	Do_spm					// transfer data from RAM to Flash page buffer
-			ldi	r18, PAGE_SIZE				// init loop variable
-			movw	r6,ZL
-writeData6:		ld	r0, Y+
-			ld	r1, Y+
-#ifdef ARDUINODUEMILANOVE
-			ldi	argVL, (1<<SELFPRGEN)
-#else
-			ldi	argVL, (1<<SPMEN)
-#endif
-			rcall	Do_spm
-			adiw	ZL, 2
-			sbci	r16,0					// RAMPZ
-			dec	r18
-			brne	writeData6
-			movw	r8,ZL
-			movw	ZL,r6
-			rcall	uploadwrite
-			movw	ZL,r8
-			dec	r17		// still pages
-			brne	writeData4
-writeData5:		rjmp	nothingResponse3
+writeFlash:		rcall	writeSpmBlock
+			rjmp	nothingResponse3
 
 readData:		rcall	conIn		// 't'     length is big endian and is in bytes ???
 			mov	XH,argVL
@@ -284,6 +204,69 @@ getSignature:		rcall	conIn			// 'u'
 			rcall	conOut
 			rjmp	nothingResponse5
 #endif
+
+; Y sram data buffer in bytes
+; X length in bytes
+; r16, Z flash address in bytes
+writeSpmBlock:		ldi	r17,0		// page count
+			sbiw	XL,0
+			breq	retSPM		// nothing to burn
+			adiw	XL,1		// even bytes
+			lsr	XH		// %2 length in words
+			ror	XL
+writeSpmBlock0:		inc	r17		// count pages
+			subi	XL,SPM_PAGESIZE/2	// compute pages in words (and burn pages!!)
+			sbci	XH,0
+			breq	writeSpmBlock1
+			brcc	writeSpmBlock0
+writeSpmBlock1:		ldi	r16,0
+			andi	ZL,SPM_PAGESIZE_MASK	// all other make not sense
+			add	ZL,ZL			// burn full pages !!
+			adc	ZH,ZH
+			adc	r16,r16			// r16,ZH,ZL holds flash byte address
+writeSpmBlock2:		rcall	writeSpmPage
+			dec	r17		// still pages
+			brne	writeSpmBlock2
+			ret 
+			
+; Y sram data buffer in bytes
+; r16, Z flash address in bytes (starts at page bounderies xxx00)
+writeSpmPage:		out	_SFR_IO_ADDR(RAMPZ),r16
+#ifdef ARDUINODUEMILANOVE
+			ldi	argVL, (1<<PGERS) |  (1<<SELFPRGEN)	//  Page Erase
+			rcall	Do_spm
+			ldi	argVL, (1<<RWWSRE) |  (1<<SELFPRGEN)	// re-enable the RWW section
+#else
+			ldi	argVL, (1<<PGERS) | (1<<SPMEN)	//  Page Erase
+			rcall	Do_spm
+			ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	// re-enable the RWW section		
+#endif
+			rcall	Do_spm			// transfer data from RAM to Flash page buffer
+			ldi	r18, SPM_PAGESIZE/2	// init loop variable in words
+			movw	r6,ZL			// save Z
+			mov	r4,r16			// save RAMPZ
+writeSpmPage0:		ld	r0, Y+
+			ld	r1, Y+
+#ifdef ARDUINODUEMILANOVE
+			ldi	argVL, (1<<SELFPRGEN)
+#else
+			ldi	argVL, (1<<SPMEN)
+#endif
+			rcall	Do_spm
+			adiw	ZL, 2
+			brcc	writeSpmPage1
+			inc	r16			// RAMPZ
+writeSpmPage1:		dec	r18
+			brne	writeSpmPage0
+			movw	r8,ZL
+			mov	r5,r16
+			movw	ZL,r6
+			mov	r16,r4
+			rcall	uploadwrite
+			movw	ZL,r8
+			mov	r16,r5
+retSPM:			ret				// r16, Z -> added page size in bytes
+							// Y -> added page size in byte
 // avrdude -pm1280 -D -Uflash:w:Blink.bin:a -c stk500v1 -P/dev/ttyUSB0 -V -b57600
 // das geht mit arduino bootloader (weil ohne int??)
 // aber nicht mit 328p macht er kein reset????
