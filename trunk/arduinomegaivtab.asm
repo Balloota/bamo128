@@ -2,7 +2,7 @@
 // atmega1280
 ;################################ iv-tab ##########################################
 RESET:			
-/*$0000*/	  jmp    BOOTSTART
+/*$0000*/	  jmp   BOOTSTART
 /*0x0002*/        jmp 	EXTINT0        ; IRQ0 Handler
 /*0x0004*/        jmp 	EXTINT1        ; IRQ1 Handler
 /*0x0006*/        jmp 	EXTINT2        ; IRQ2 Handler
@@ -14,7 +14,7 @@ RESET:
 /*0x0012*/        jmp	EXTPCINT0      ; PCINT0 Handler
 /*0x0014*/        jmp	EXTPCINT1      ; PCINT1 Handler
 /*0x0016*/        jmp	EXTPCINT2      ; PCINT2 Handler
-/*0X0018*/        jmp	WDT         ; Watchdog Timeout Handler
+/*0X0018*/        jmp	WDT        	; Watchdog Timeout Handler
 /*0x001A*/        jmp	saveCPU		; monitor step mode!! TIM2_COMPA  ; Timer2 CompareA Handler
 /*0x001C*/        jmp	TIM2_COMPB  ; Timer2 CompareB Handler
 /*0x001E*/        jmp	TIM2_OVF    ; Timer2 Overflow Handler
