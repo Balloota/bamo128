@@ -143,93 +143,33 @@ sRamEEpromCopy3:	push	YL
 			brne	sRamEEpromCopy3
 sRamEnd:
 sRamFlashEnd:		ret		
+
 //csf
 sRamFlashCopy:	rcall	outFlashText
 .string		"dangerous!!!\t"
 .align 1
 		rcall	conInAdrSupWS		// test for valid addresses!! < 0x7fff
-		movw	ZL,YL			// nur 256 Byte Blöcke interessieren
+		movw	r4,YL			// sram sta
 		rcall	spaceConOut
 		rcall	conInAdrSupWS		// endadr im sRam
-		movw	XL,YL			// endadr in X
-		cp	XL,ZL
-		cpc	XH,ZH
-		brcs	sRamFlashEnd
-		inc	XH		
+		movw	XL,YL			// endadr in X, staadr in Z
+		cp	XL,r4
+		cpc	XH,r5
+		brcs	sRamFlashEnd		// endadr > staadr
+		sub	XL,r4
+		sbc	XH,r5			// length in X in bytes
 sRamFlashCopy3: rcall 	spaceConOut
-		rcall	conInAdrSupWS		// destadr
-		cpi	YH,0xf0
-		brcc	sRamEnd			// bootsection!!!
-sRamFlashCopy1:	push	ZH
-		push	YH
-		pop	ZH			; dest flash in Z
-		pop	YH			; sta sRam in Y
-		mov	ZL,YL
-		andi	ZL,0x80		// only full pages !!
-		clr	YL		// 256 Bytes von YH,00 nach 128 Words ZH,00
-sRamFlashCopy2:	push	ZH
-		push	ZL
-		rcall	copyPage
-		pop	ZL
-		pop	ZH
-		cp	YH,XH
-		breq	sRamEnd
-sRamFlashCopy4:	adiw	ZL,63		; next page
-		adiw	ZL,63
-		adiw	ZL,2
-		rjmp	sRamFlashCopy2
+		rcall	conInAdrSupWS		// destadr in Y
+sRamFlashCopy1:	movw	ZL,YL			// flash address in Z n words
+		movw	YL,r4			; sta sRam in Y in bytes
+		rjmp	writeSpmBlock
 
-copyPage:	ldi	argVL, SPM_PAGESIZE/2 		;for 128 words
-		mov	r15,argVL
-CopyRamToTxt:	clr	argVL
-		sbrc	ZH,7				; Flash
-		inc	argVL
-		out	_SFR_IO_ADDR(RAMPZ),argVL			; bit 15 of Z in RAMPZ
-		LSL	ZL
-		ROL	ZH				; shift Z to bytes Z0==0
-		push	ZL				; save byte in page
 #ifdef ARDUINODUEMILANOVE
-		ldi	argVL,(1<<PGERS) | (1<<SELFPRGEN)
-#else
-		ldi 	argVL, (1<<PGERS) | (1<<SPMEN)	; page erase
+#define SPMEN SELFPRGEN
 #endif
-		rcall	Do_spm
-#ifdef ARDUINODUEMILANOVE
-		ldi	argVL,(1<<RWWSRE) | (1<<SELFPRGEN)
-#else
-		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
-#endif
-		rcall	Do_spm
-Wrloop:		push	ZH
-		push	ZL
-		rcall	getSRamByte
-		mov	r1,argVL	// high endian littel endian !!! total verrueckt
-		adiw	YL,1
-		rcall	getSRamByte
-		mov	r0,argVL
-		adiw	YL,1				; transfer data bytes from RAM to Flash page buffer
-		pop	ZL
-		pop	ZH
-#ifdef ARDUINODUEMILANOVE
-		ldi	argVL,(1<<SELFPRGEN)
-#else
-		ldi	argVL,(1<<SPMEN)	; re-enable the RWW section
-#endif
-		rcall	Do_spm
-		inc	ZL				; next word
-		inc	ZL
-		dec	r15
-		brne	Wrloop
-		pop	ZL
-#ifdef ARDUINODUEMILANOVE
-uploadwrite:	ldi	argVL, (1<<PGWRT) | (1<<SELFPRGEN)	; execute write
-		rcall	Do_spm
-		ldi	argVL, (1<<RWWSRE) | (1<<SELFPRGEN)	; re-enable the RWW section
-#else
 uploadwrite:	ldi	argVL, (1<<PGWRT) | (1<<SPMEN)	; execute write
 		rcall	Do_spm
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
-#endif
 		rcall	Do_spm
 uploadwrite1:	clr	zeroReg
 #ifdef ARDUINOMEGA
@@ -240,15 +180,12 @@ uploadwrite1:	clr	zeroReg
 #endif
 		sbrs	argVL, RWWSB	; If RWWSB is set, the RWW section is not ready yet
 		ret
-#ifdef ARDUINODUEMILANOVE
-		ldi	argVL, (1<<RWWSRE) | (1<<SELFPRGEN)	; re-enable the RWW section
-#else
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
-#endif
 		rcall	Do_spm
 		rjmp	uploadwrite1
-
-
+#ifdef ARDUINODUEMILANOVE
+#undef SELFPRGEN
+#endif
 
 CopyTxtToRam:			pop	ZH				; write text from text segment untested!!!
 							pop	ZL				; get flash-textaddress->Initialize Z-pointer
