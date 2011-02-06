@@ -134,6 +134,11 @@ flashMatrixLoop:		LDI			argVL,GREEN
 			rjmp	flashMatrixEnd
 //.org 0xf800
 //.section text1
+// here starts boot section, make it better
+//						rjmp	skippy
+.word 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
+						jmp	BOOTSTART	// 0x3800 ist here!!
+
 flashMatrixEnd:		pop		argVH
 						pop		argVL
 						pop		YH
@@ -144,10 +149,6 @@ flashMatrixEnd:		pop		argVH
 						push		argVH
 
 
-// here starts boot section, make it better
-						rjmp	skippy
-.word 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00
-						jmp	BOOTSTART	// 0x3800 ist here!!
 
 skippy:						mov		argVL,YL		;	set Cursor
 						mov		argVH,YH
