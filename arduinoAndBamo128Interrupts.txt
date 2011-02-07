@@ -1,5 +1,5 @@
 The resident monitor bamo128 allows to burn and start application programs with the go ('g')->command.
-Applications are compiled, linked and loaded  independently at address 0. 
+Applications are compiled, linked and loaded  independently at address 0 normally. 
 If you dont link your application at the monitor bamo128 you can not use the step('s')- and break('x')- command 
 and you must comment in mainloop.asm the line:
 // rcall startTimer1
