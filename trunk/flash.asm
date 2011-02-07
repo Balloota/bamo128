@@ -244,7 +244,7 @@ prepareBootLoading0:	ldi	YL,lo8(pm(prepareBootLoading0))
 			ldi	YH,hi8(pm(prepareBootLoading0))
 			push	YL
 			push	YH
-
+			cli		// todo clean interupt handling while flushing
 prepareBootLoading2:	
 prepareBootLoading1:rcall	conIn
 		rcall	switchCase
