@@ -20,9 +20,8 @@ Currently we use bamo128 at boards with the atmega128 (CharonII with 32K externa
 the Mica2 without external RAM), the ArduinoMega-Bord (atmega1280) and the ArduinoDuemilanove-Board (atmega328p) also.
 
 You can simple burn the monitor in a naked microcontroller with your programmer.
-We use for the CharonII the STK500-programmer and usip and for the ArduinoMega the programmer avrISPmkII and avrdude.
-
-From command line in linux type for the ArduinoMega board:
+We use for the CharonII the STK500-programmer and uisp and for the ArduinoMega the programmer avrISPmkII and avrdude.
+From command line in linux type for the ArduinoMega board (du for arduinoDuemilanove):
 $> make fuses am		
 writes fuses ( 4Kword boot section, start after reset in boot section).
 $> make all am
@@ -36,7 +35,7 @@ Arduinokermit stands for a terminal program with a stk500v1 compatible bootloade
 
 $>./arduinokermit		# compile arduinokermit with 57600 (115200) and your serial lines
 
-that is the coldstart greeting line and the prompt af bamo128:
+that is the coldstart (about 1/2 second after reset because arduino reset behavior) greeting line and the prompt af bamo128:
     ___________________BAMo128 Version:0.08 _________________
      from students of the BA Berlin written for the ArduinoMega
 
@@ -50,13 +49,16 @@ and type the bin-file name of your program:
     page:   1 with af bytes written (last page)  filelength: 01af
     BAMo128 #> 
 
-you can start now the program with g startaddress, addresses are word addresses.
+You can start now the program with g startaddress (80 if 0x80 is the start address), addresses are word addresses.
+If your application program overwrite the interrupt vector table (its normally so), you must insert the code in
+"arduinoAndBamo128Interrupts.txt" in your application code.
 If necessary you can set registers/flags/io-ports/memory before program-start:
     BAMo128 #> g 80
 
 Bamo128 supports external programming software with stk500V1-protocol also (arduino development environment and avrdude).
-You can replace the 2K word arduino bootloader on arduino boards by bamo128 and can load (and run)  compiled sketches
-from the arduino development environment.
+You can replace the 2K word arduino bootloader on arduino boards by bamo128 and can load (and run) compiled sketches
+from the arduino development environment. The difference is that application starts now not automatically after reset 
+and about 1/2 second but with the monitor go-command (g 0).
 Bamo128 works with interrupts ('s'- step mode and millisec -timer). Therefore the application program must fill the interrupt
 vector table with proper isr-jumps (see arduinoAndBamo128Interrupts.txt),if you want to use this features.
 
