@@ -208,7 +208,9 @@ getSignature:		rcall	conIn			// 'u'
 ; Y sram data buffer in bytes
 ; X length in bytes
 ; r16, Z flash address in bytes
-writeSpmBlock:		ldi	r17,0		// page count
+writeSpmBlock:		in	r15,_SFR_IO_ADDR(SREG)
+			cli		//todo
+			ldi	r17,0		// page count
 			sbiw	XL,0
 			breq	retSPM		// nothing to burn
 			adiw	XL,1		// even bytes
@@ -227,6 +229,7 @@ writeSpmBlock1:		ldi	r16,0
 writeSpmBlock2:		rcall	writeSpmPage
 			dec	r17		// still pages
 			brne	writeSpmBlock2
+			out	_SFR_IO_ADDR(SREG),r15	// todo
 			ret 
 			
 ; Y sram data buffer in bytes
@@ -267,6 +270,8 @@ writeSpmPage1:		dec	r18
 			mov	r16,r5
 retSPM:			ret				// r16, Z -> added page size in bytes
 							// Y -> added page size in byte
+
+
 // avrdude -pm1280 -D -Uflash:w:Blink.bin:a -c stk500v1 -P/dev/ttyUSB0 -V -b57600
 // das geht mit arduino bootloader (weil ohne int??)
 // aber nicht mit 328p macht er kein reset????
