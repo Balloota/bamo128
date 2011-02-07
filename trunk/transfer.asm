@@ -178,6 +178,9 @@ uploadwrite1:	clr	zeroReg
 #ifdef CHARON
 		lds	argVL,SPMCSR
 #endif
+#ifdef ARDUINODUEMILANOVE
+		in	argVL,_SFR_IO_ADDR(SPMCSR)
+#endif
 		sbrs	argVL, RWWSB	; If RWWSB is set, the RWW section is not ready yet
 		ret
 		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
