@@ -236,15 +236,13 @@ uploaderror:		ldi		argVL,0x5
 
 #ifdef STK500PROTOCOLUPLOADFLASH		// arduino like
 prepareUpLoadFlash:	// after reset (sw-reset from external programmer)
-			// and  bamo-w-command
 			ldi	argVH,'F'
-			// rcall	stopTimer1 // uncomment, if your application program has an entry in ivtab for timer 1
-prepareUpLoad:		
+prepareUpLoad:		in	r3,_SFR_IO_ADDR(RAMPZ)	; do not use r3 while uploading
+			cli
 prepareBootLoading0:	ldi	YL,lo8(pm(prepareBootLoading0))
 			ldi	YH,hi8(pm(prepareBootLoading0))
 			push	YL
 			push	YH
-			cli		// todo clean interupt handling while flushing
 prepareBootLoading2:	
 prepareBootLoading1:rcall	conIn
 		rcall	switchCase
@@ -285,7 +283,6 @@ prepareBootLoading1:rcall	conIn
 #else // not recommended
 upLoadFlash:		ldi	XL,0	// RAMPZ 0 or 1
 			ldi	XH,0	// 256 pages with 256 words
-
 upLoadFlashWithOffset1:  	rcall	stopTimer1
 		ldi	argVL,0x4
 		rcall	serOut				; turn off echo
@@ -351,22 +348,22 @@ uploadend:	rcall	conInAdrSupWS
 #ifdef ARDUINODUEMILANOVE
 Do_spm:; check for previous SPM complete
 Wait_spm:	in	argVH,_SFR_IO_ADDR(SPMCSR)
-		sbrc argVH, SELFPRGEN
-		rjmp Wait_spm
+		sbrc 	argVH, SELFPRGEN
+		rjmp 	Wait_spm
 ; input: spmcrval determines SPM action
 ; disable interrupts if enabled, store status
-		in	argVH,_SFR_IO_ADDR(SREG)
-		cli	; check that no EEPROM write access is present
-Wait_ee:	sbic _SFR_IO_ADDR(EECR), EEPE
+//		in	argVH,_SFR_IO_ADDR(SREG)
+//		cli	// start upLoad disables interrupts
+Wait_ee:	sbic _SFR_IO_ADDR(EECR), EEPE	;; check that no EEPROM write access is present
 		rjmp Wait_ee	; SPM timed sequence
 		out _SFR_IO_ADDR(SPMCSR), argVL
 		spm	; restore SREG (to enable interrupts if originally enabled)
-		out _SFR_IO_ADDR(SREG), argVH
+//		out _SFR_IO_ADDR(SREG), argVH
 		ret
 #else
-Do_spm:		in	argVH, _SFR_IO_ADDR(SREG)
-		push	argVH
-		cli
+Do_spm:		//in	argVH, _SFR_IO_ADDR(SREG)
+		//push	argVH
+		//cli
 Do_spm1:
 #ifdef ARDUINOMEGA
 		in 	 argVH,_SFR_IO_ADDR(SPMCSR)	; check for previous SPM complete
@@ -387,8 +384,8 @@ waitEE:		sbic	_SFR_IO_ADDR(EECR),EEPE
 		sts 	 SPMCSR, argVL	; check for previous SPM complete
 #endif
 		spm
-		pop	argVH
-		out	_SFR_IO_ADDR(SREG),argVH
+		//pop	argVH
+		//out	_SFR_IO_ADDR(SREG),argVH
 		ret
 #endif
 
