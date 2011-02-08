@@ -80,6 +80,7 @@ parProgrammer:		ldi	argVH,5			// 'E'
 			rjmp	deviceParameter0
 			
 reEnter:		rcall	nothingResponse		// 'Q'
+			out	_SFR_IO_ADDR(RAMPZ),r3
 			jmp	mainLoop
 
 getAdr:			rcall	conIn			// 'U' 
@@ -208,11 +209,11 @@ getSignature:		rcall	conIn			// 'u'
 ; Y sram data buffer in bytes
 ; X length in bytes
 ; r16, Z flash address in bytes
-writeSpmBlock:		in	r15,_SFR_IO_ADDR(SREG)
-			cli		//todo
+writeSpmBlock:		// in	r15,_SFR_IO_ADDR(SREG)
+			// cli			// no interrupts whilst flashing
 			ldi	r17,0		// page count
 			sbiw	XL,0
-			breq	retSPM		// nothing to burn
+			breq	writeSpmBlock3	// nothing to burn
 			adiw	XL,1		// even bytes
 			lsr	XH		// %2 length in words
 			ror	XL
@@ -229,7 +230,7 @@ writeSpmBlock1:		ldi	r16,0
 writeSpmBlock2:		rcall	writeSpmPage
 			dec	r17		// still pages
 			brne	writeSpmBlock2
-			out	_SFR_IO_ADDR(SREG),r15	// todo
+writeSpmBlock3://		out	_SFR_IO_ADDR(SREG),r15
 			ret 
 			
 ; Y sram data buffer in bytes
@@ -265,7 +266,20 @@ writeSpmPage1:		dec	r18
 			mov	r5,r16
 			movw	ZL,r6
 			mov	r16,r4
-			rcall	uploadwrite
+#ifdef ARDUINODUEMILANOVE
+			ldi 	argVL, (1<<PGWRT) | (1<<SELFPRGEN)
+			rcall	Do_spm
+; re-enable the RWW section
+			ldi	argVL, (1<<RWWSRE) | (1<<SELFPRGEN)
+			rcall	Do_spm
+#else
+			ldi	argVL, (1<<PGWRT) | (1<<SPMEN)
+			call Do_spm
+; re-enable the RWW sectrion
+			ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)
+			rcall Do_spm
+
+#endif
 			movw	ZL,r8
 			mov	r16,r5
 retSPM:			ret				// r16, Z -> added page size in bytes
