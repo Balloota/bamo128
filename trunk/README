@@ -24,6 +24,7 @@ We use for the CharonII the STK500-programmer and uisp and for the ArduinoMega t
 From command line in linux type for the ArduinoMega board (du for arduinoDuemilanove):
 $> make fuses am		
 writes fuses ( 4Kword boot section, start after reset in boot section).
+(du for Duemilanove but 2K boot section, monitor begins at 0x3000 and starts after reset at 0x3800).
 $> make all am
 generates the hex file bamo128.hex and burns the monitor file  in the microcontroller atmega1280 on the ArduinoMega board
 You can now with 
