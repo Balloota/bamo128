@@ -164,32 +164,6 @@ sRamFlashCopy1:	movw	ZL,YL			// flash address in Z n words
 		movw	YL,r4			; sta sRam in Y in bytes
 		rjmp	writeSpmBlock
 
-#ifdef ARDUINODUEMILANOVE
-#define SPMEN SELFPRGEN
-#endif
-uploadwrite:	ldi	argVL, (1<<PGWRT) | (1<<SPMEN)	; execute write
-		rcall	Do_spm
-		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
-		rcall	Do_spm
-uploadwrite1:	clr	zeroReg
-#ifdef ARDUINOMEGA
-		in	argVL,_SFR_IO_ADDR(SPMCSR)
-#endif
-#ifdef CHARON
-		lds	argVL,SPMCSR
-#endif
-#ifdef ARDUINODUEMILANOVE
-		in	argVL,_SFR_IO_ADDR(SPMCSR)
-#endif
-		sbrs	argVL, RWWSB	; If RWWSB is set, the RWW section is not ready yet
-		ret
-		ldi	argVL, (1<<RWWSRE) | (1<<SPMEN)	; re-enable the RWW section
-		rcall	Do_spm
-		rjmp	uploadwrite1
-#ifdef ARDUINODUEMILANOVE
-#undef SELFPRGEN
-#endif
-
 CopyTxtToRam:			pop	ZH				; write text from text segment untested!!!
 							pop	ZL				; get flash-textaddress->Initialize Z-pointer
 							LSL	ZL
