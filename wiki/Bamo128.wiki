@@ -1,0 +1,2 @@
+= Bamo128 = 
+is a resident monitor program for AVR8 microcontroller.
