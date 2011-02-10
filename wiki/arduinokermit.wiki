@@ -1,3 +1,9 @@
 #summary terminal program for microcontroller
-arduinokermit is a linux-terminal program for communication and upload files at microcontroller.<br>
+arduinokermit is a linux-terminal program for communication and uploading files at microcontroller.<br>
 Download arduinokermit**.tar.gz from http://minikermit.googlecode.com.<br>
+Unpack it and compile arduinokermit.c:<br>
+#>g++ arduinokermit.c -lncurses -oarduinokermit<br>
+Connect the arduinoboard (or other AVR8 board) -with bamo128 uploaded- via USB with the pc and start arduinokermit:<br>
+#./arduinokermit<br>
+You can now use the monitor commands, upload programs and start application programs.
+Applications are able to communicate via serial port with arduinokermit also.<br>
