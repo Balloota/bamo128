@@ -4,7 +4,7 @@ is a resident monitor program for AVR8 microcontroller. It is written in assembl
 After reset (exactly about 1/2 second after reset - in this time bamo128 waits for external programmer in "ardiuno style") you see in the terminal window the greetings and the prompt line of bamo128:<br>
     ___________________BAMo128 Version:0.08 _________________
      from students of the BA Berlin written for the ArduinoMega<br><br>
-    BAMo128 #><br>
+    BAMo128 #>
 === Bamo128 commands ===
 ||'a'  || authors||
 ||'h'    || help||
