@@ -22,4 +22,4 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
 ||'x' adr ||starts program at adr up to braekpoint (realized with timer2-interrupt)||
 ||'b'     ||set/clear breakpoints||
 ||'u' adr ||disassemble||
-||'c'|| copy ram/ram, ram/flash, flash/ram, ram/eeprom, eeprom/ram,eeprom||/eeprom<br>
+||'c'|| copy ram/ram, ram/flash, flash/ram, ram/eeprom, eeprom/ram,eeprom/eeprom||
