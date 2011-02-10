@@ -23,3 +23,20 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
 'b'     - set/clear breakpoints<br>
 'u' adr - disassemble<br>
 'c'     - copy ram/ram, ram/flash, flash/ram, ram/eeprom, eeprom/ram,eeprom/eeprom<br>
+
+{| border="1" cellpadding="2" cellspacing="0"
+|+ align="bottom" style="color:#e76700;" |''Absolute Maximum Ratings''
+|||Operating Temperature....................................||    -55⋅C to +125⋅C
+|-
+|||Storage Temperature .....................................||   -65°C to +150°C
+|-
+|für atmega128A||Voltage at any pin with respect to Ground .................|| -0.5V to VCC+0.5V
+|-
+|||Voltage on RESET with respect to Ground......|| -0.5V to +13.0V
+|-
+|||Maximum Operating Voltage ............................................ ||6.0V
+|-
+|||DC Current per I/O Pin ...............................................||40.0 mA
+|-
+|||DC Current VCC and GND Pins.....................||200.0 - 400.0mA
+|}
