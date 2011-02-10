@@ -1,0 +1,4 @@
+
+=== software requirements===
+Install the GNU toolchain (avr-gcc,for avr8 microcontroller under linux. The latest tools are hidden in avr32studio www.atmel.no/beta_ware currently.
+If you download and unpack avr32studio in the /opt/cross dir, your environment is compatible with the bamo129 paths.
