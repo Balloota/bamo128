@@ -5,7 +5,7 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
     ___________________BAMo128 Version:0.08 _________________
      from students of the BA Berlin written for the ArduinoMega<br><br>
     BAMo128 #><br>
-= Bamo128 commands =
+=== Bamo128 commands ===
 'a'     - authors<br>
 'h'     - hel<<br>
 'm' sta - Ram display/modify<br>
@@ -18,8 +18,8 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
 'E'     - data file load at 'adr' in eeprom<br>
 'g' adr - starts program at adr<br>
 's' adr - step-mode at adr(realzed with timer2-interrupt)<br>
-          repeat 'step' -> type simply <LFCR><br>
+          repeat 'step' -> type simply '<LFCR>'<br>
 'x' adr - starts program at adr up to braekpoint (realized with timer2-interrupt)<br>
 'b'     - set/clear breakpoints<br>
 'u' adr - disassemble<br>
-'c' - Kopieren RAM/RAM, RAM/FLASH, FLASH/RAM, RAM/EEPROM, EEPROM/RAM, EEPROM/EEPROM
+'c'     - copy ram/ram, ram/flash, flash/ram, ram/eeprom, eeprom/ram,eeprom/eeprom<br>
