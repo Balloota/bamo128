@@ -18,7 +18,7 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
 'E'     - data file load at 'adr' in eeprom<br>
 'g' adr - starts program at adr<br>
 's' adr - step-mode at adr(realzed with timer2-interrupt)<br>
-          repeated 'step' -> type simply &#3C;LFCR&#3E;<br>
+          repeated 'step' -> type simply &lt;LFCR&gt;<br>
 'x' adr - starts program at adr up to braekpoint (realized with timer2-interrupt)<br>
 'b'     - set/clear breakpoints<br>
 'u' adr - disassemble<br>
