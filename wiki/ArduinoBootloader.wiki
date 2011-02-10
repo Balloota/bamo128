@@ -1,5 +1,6 @@
 #summary bamo128 as arduino bootloader.
 in preparation<br>
+=== behavior of arduino boards and arduino bootloader===
 You can reset arduino boards per software from pc over the serial USB-cable.<br>
 The software activates the DTR control line of serial port and a capacitor at the board produce an reset impuls.<br>
 The arduino integrated development environment (IDE) and avrdude (with the programmer option -carduino) use this software reset for bootloading.<br>
@@ -7,4 +8,15 @@ The bootloader shipped with the arduino board waits after reset about 1/2 second
 If it no chars received, it starts the application program at address 0 (if there is such program).<br>
 If it chars received, the bootloader checks the chars.<br>
 If the chars are control sequences of the stk500V1 uploading protocol, uploading software is started. The Arduino-IDE and avrdude send this sequences for uploading.
-You can within the 1/2 second after reset send some '!' chars from a terminal and the bootloader switch to the simple monitor integrated in some arduino bootloaders.<br><br>
+You can within the 1/2 second after reset send some '!' chars from a terminal and the bootloader switch to the simple monitor integrated in some arduino bootloaders.<br>
+I hope this description is correct!!<br>
+===Bamo128 as arduino bootloader===
+Bamo128 uploads software and data with the stk500V1 protocol.<br>
+It waits after reset about 1/2 second for chars from serial USB port.<br>
+If it so, it jumps to the uploading code and bamo128 (how the arduino boards) upload software.<br>
+In the other case (no chars received), it jumps to the monitor and waits forever for bamo128 monitor commands.<br>
+The main difference is that arduino boards starts applications if no chars received after reset but bamo128 jumps to the monitor.<br>
+You must start teh application wit the monitor command:<br>
+#> g 0<br>
+explicitely.<br>
+Feel free to change this behavior in the open bamo128 software.<br>
