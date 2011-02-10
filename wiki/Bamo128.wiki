@@ -6,7 +6,7 @@ After reset (exactly about 1/2 second after reset - in this time bamo128 waits f
      from students of the BA Berlin written for the ArduinoMega<br><br>
     BAMo128 #><br>
 === Bamo128 commands ===
-'a'     - authors<br>
+||'a' ||    - authors||<br>
 'h'     - hel<<br>
 'm' sta - Ram display/modify<br>
 'e' sta - eeprom display/modify<br>
