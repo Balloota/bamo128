@@ -1,2 +1,2 @@
-#bamo128 as arduino bootloader
+#comment bamo128 as arduino bootloader.
 nnnnnnnnnnnnnn
