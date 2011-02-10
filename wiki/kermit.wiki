@@ -1,6 +1,6 @@
 #summary communication with bamo128 over kermit
 You can use kermit, the known terminal interaction and file transfer program, to  communicate with bamo128 (without data/program uploading).<br>
-Save a initialization file in your home dir:<br>
+Save an initialization file in your home dir:<br>
 {{{
 ; Line properties
 set modem type             none ; Direct connection
