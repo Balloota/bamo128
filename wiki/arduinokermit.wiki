@@ -1,0 +1,2 @@
+#summary terminal program for microcontroller
+arduinokermit is a linux-terminal program for communication and upload files at microcontroller.
