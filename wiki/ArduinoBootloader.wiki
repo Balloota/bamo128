@@ -1,2 +1,10 @@
 #summary bamo128 as arduino bootloader.
-nnnnnnnnnnnnnn
+in preparation<br>
+You can reset arduino boards per software from pc over the serial USB-cable.<br>
+The software activates the DTR control line of serial port and a capacitor at the board produce an reset impuls.<br>
+The arduino integrated development environment (IDE) and avrdude (with the programmer option -carduino) use this software reset for bootloading.<br>
+The bootloader shipped with the arduino board waits after reset about 1/2 second for characters from serial USB-port.<br>
+If it no chars received, it starts the application program at address 0 (if there is such program).<br>
+If it chars received, the bootloader checks the chars.<br>
+If the chars are control sequences of the stk500V1 uploading protocol, uploading software is started. The Arduino-IDE and avrdude send this sequences for uploading.
+You can within the 1/2 second after reset send some '!' chars from a terminal and the bootloader switch to the simple monitor integrated in some arduino bootloaders.<br><br>
