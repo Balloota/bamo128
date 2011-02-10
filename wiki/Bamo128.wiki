@@ -1,9 +1,25 @@
 = Bamo128 = 
 in preparation<br>
 is a resident monitor program for AVR8 microcontroller. It is written in assembler and you can burn it with an appropriate programmer (avrIspmkII, stk500,..) and programming software (arvdude) in the microcontroller. After reset the monitor starts and waits for interaction with the user over serial communication lines (RS232, USB) and a pc-terminal software. arduinokermit http://minikermit.googlecode.com is a terminal program well adapted for bamo128.<br>
-After reset (exactly about 1/2 second after reset - in this time bamo128 waits for external programmer in "ardiuno style") you see in the terminal window the greetings and the prompt line of bamo128:<br
+After reset (exactly about 1/2 second after reset - in this time bamo128 waits for external programmer in "ardiuno style") you see in the terminal window the greetings and the prompt line of bamo128:<br>
     ___________________BAMo128 Version:0.08 _________________
      from students of the BA Berlin written for the ArduinoMega<br><br>
     BAMo128 #><br>
-Interaction- commands are:<br>
-a   -  
+= Bamo128 commands =
+'a'     - authors<br>
+'h'     - hel<<br>
+'m' sta - Ram display/modify<br>
+'e' sta - eeprom display/modify<br>
+'f' sta - flash display<br>
+'r'     - register/flags display/modify ('R')<br>
+'w'     - binary file (executable program) load at flash address 0<br>
+'W'     - binary file (executable program) load at 'adr'<br>
+'S'     - data file load at 'adr' in sram<br>
+'E'     - data file load at 'adr' in eeprom<br>
+'g' adr - starts program at adr<br>
+'s' adr - step-mode at adr(realzed with timer2-interrupt)<br>
+          repeat 'step' -> type simply <LFCR><br>
+'x' adr - starts program at adr up to braekpoint (realized with timer2-interrupt)<br>
+'b'     - set/clear breakpoints<br>
+'u' adr - disassemble<br>
+'c' - Kopieren RAM/RAM, RAM/FLASH, FLASH/RAM, RAM/EEPROM, EEPROM/RAM, EEPROM/EEPROM
