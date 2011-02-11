@@ -5,7 +5,7 @@ Save an initialization file in your home dir:<br>
 ; Line properties
 set modem type             none ; Direct connection
 set line           /dev/ttyUSB0 ; Device file
-set speed                57600 ; Line speed
+set speed                 57600 ; Line speed
 set carrier-watch           off ; No carrier expected
 set handshake              none ; No handshaking
 set flow-control           none ; No flow control
@@ -19,6 +19,9 @@ set window                   10 ; Nbr of packets to send until ack
 ; File transfer properties
 set file type            binary ; All files transferred are binary
 set file names          literal ; Don't modify filenames during xfers
+
+
 and start kermit in a terminal window:<br>
+
 #> kermit -c
 }}}
