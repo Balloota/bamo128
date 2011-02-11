@@ -21,7 +21,7 @@ set file type            binary ; All files transferred are binary
 set file names          literal ; Don't modify filenames during xfers
 
 
-and start kermit in a terminal window:<br>
+Connect your arduino via USB with the pc and start kermit in a terminal window:<br>
 
 #> kermit -c
 }}}
