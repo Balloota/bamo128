@@ -2,7 +2,7 @@
 === software requirements===
 in preparation<br>
 Install the GNU toolchain (avr-gcc,...) for avr8 microcontroller under linux and avrdude for monitor uploading. The latest GNU tools are hidden in avr32studio http://www.atmel.no/beta_ware currently.
-If you download and unpack avr32studio in the /opt/cross dir, your environment is compatible with the bamo128 paths.<br>
+If you download and unpack avr32studio in the /opt/cross directory, your environment is compatible with the bamo128 paths.<br>
 Unpack bamo128xx.tar.gz. Connect your board with a programmer and the programmer and the board via USB with our pc.<br>
 We use the programmer avrISPmkII for arduino boards, for other programmers change the Makefile in the bamo128 directory.
 === bamo128 at atmega processors ===
@@ -10,7 +10,16 @@ Bamo128 needs 4Kword (a 16 bit) flash program memory space preferabely in the bo
 In the standard installation starts bamo128 after reset in the bootsection, where the monitor is placed. The interrupt vector table is at the beginning of flash memory (address 0).<br>
 Bamo128 works with interrupt (timer2 for the step and break command, timer1 for the currentTimeMilliSec variable) and burns 2 entries in the vector table.
 === installation for arduino boards ===
-The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328).
+The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328). In a terminal window type:
+||for arduino Mega ||for arduino Duemilanove and compatible||
+||#> make all am     ||make all du||
+and for setting fuses in controller:
+|| 4K word bootsection 0xF000-0xFFFF || 2K word bootsection 0x3800 - 0x3FFF||
+||start at bootsection after reset  ||  start at bootsection after reset   ||
+||#> make fuses am||#> make fuses du||
+For the duemilanove the monitor starts at 0x3000 and ends at 0x3FFF.<br>
+At address 0x3800 (start after reset) is a jump to 0x3000.<br>
+
 
 
 === cooperation of bamo128 with applications === 
