@@ -1,8 +1,15 @@
 === software requirements===
 in preparation<br>
-Install the GNU toolchain (avr-gcc,...) for avr8 microcontroller under linux. The latest tools are hidden in avr32studio http://www.atmel.no/beta_ware currently.
+Install the GNU toolchain (avr-gcc,...) for avr8 microcontroller under linux and avrdude for monitor uploading. The latest GNUU tools are hidden in avr32studio http://www.atmel.no/beta_ware currently.
 If you download and unpack avr32studio in the /opt/cross dir, your environment is compatible with the bamo128 paths.<br>
 Unpack bamo128xx.tar.gz. Connect your board with a programmer and the programmer and the board via USB with our pc.<br>
 We use the programmer avrISPmkII for arduino boards, for other programmers change the Makefile in the bamo128 directory<br>.
+=== quick and simple installation for arduinos ===
+Bamo128 needs 4Kword (a 16 bit) flash program memory space preferabely in the bootsection of controller
+In the download area are
+=== installation for arduino boards ===
+
 The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328).<br>
+
+=== 
 Adapt the Makefile for other boards. 
