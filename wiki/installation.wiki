@@ -11,7 +11,18 @@ In the standard installation starts bamo128 after reset in the bootsection, wher
 Bamo128 works with interrupt (timer2 for the step and break command, timer1 for the currentTimeMilliSec variable) and burns 2 entries in the vector table.
 === installation for arduino boards ===
 The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328).<br>
+
+
 === cooperation of bamo128 with applications === 
 With bamo128 you can upload application<br>
-=== 
-Adapt the Makefile for other boards. 
+-Wl,--defsym=__stack=0x801000
+
+
+void code_init2() __attribute__ ((naked, section (".init2")));
+
+/* !!! never call this function !!! */
+void code_init2 (void)
+{
+   SP = 0x1000;
+}
+=== bamo128 at other boards and for other controllers. ===
