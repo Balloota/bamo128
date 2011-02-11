@@ -4,13 +4,13 @@ in preparation<br>
 Install the GNU toolchain (avr-gcc,...) for avr8 microcontroller under linux and avrdude for monitor uploading. The latest GNU tools are hidden in avr32studio http://www.atmel.no/beta_ware currently.
 If you download and unpack avr32studio in the /opt/cross dir, your environment is compatible with the bamo128 paths.<br>
 Unpack bamo128xx.tar.gz. Connect your board with a programmer and the programmer and the board via USB with our pc.<br>
-We use the programmer avrISPmkII for arduino boards, for other programmers change the Makefile in the bamo128 directory<br>.
+We use the programmer avrISPmkII for arduino boards, for other programmers change the Makefile in the bamo128 directory.
 === bamo128 at atmega processors ===
 Bamo128 needs 4Kword (a 16 bit) flash program memory space preferabely in the bootsection of controller (at least the routine Do_spm in file flash.asm) and 256 Byte sram (the best place for sram memory is at INTERNAL_SRAM_END for boards without external ram).<br>
 In the standard installation starts bamo128 after reset in the bootsection, where the monitor is placed. The interrupt vector table is at the beginning of flash memory (address 0).<br>
 Bamo128 works with interrupt (timer2 for the step and break command, timer1 for the currentTimeMilliSec variable) and burns 2 entries in the vector table.
 === installation for arduino boards ===
-The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328).<br>
+The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328).
 
 
 === cooperation of bamo128 with applications === 
