@@ -46,4 +46,7 @@ void code_init2 (void)
 #endif
 }
 }}}
-equivalent
+an equivalent effect you get with a linker option:<br>
+-Wl,--defsym=__stack=0x8003ff<br>
+
+=== Use of monitor functions and variables in application programs===
