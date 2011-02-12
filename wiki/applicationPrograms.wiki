@@ -44,3 +44,4 @@ void code_init2 (void)
 #endif
 }
 }}}
+equivalent
