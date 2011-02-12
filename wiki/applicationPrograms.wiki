@@ -1,7 +1,9 @@
 #summary bamo128 and arduino sketches and C/C++/asm - application programs
 
 You can upload application programs bamo128 from the arduino IDE or with the 'w' and 'W' - command from monitor. Programs are loaded at flash address 0 normally.<br>
-This programs overwrite the interrupt vector table at address 0 and if you activate the timer1 in "mainloop.asm" the system crash. It crashed also, if you use the monitor 's' (step) or 'x'(start with breakpoint because it is realized with time2 interrupt. But you can avoid this, if you in your C/C++/Arduino-sourcecode insert this lines (for atmega1280 or atmega328):<br>
+This programs overwrite the interrupt vector table at address 0 and if you activate the timer1 in "mainloop.asm" the system crash. <br>
+It crashed also, if you use the monitor 's' (step) or 'x'(start with breakpoint because it is realized with time2 interrupt.<br>
+But you can avoid this, if you in your C/C++/Arduino-sourcecode insert this lines (for atmega1280 or atmega328):<br>
 {{{
 #define	BYTES(word)	((word)*2)
 #define	STRING(a,b)	#a" "#b
