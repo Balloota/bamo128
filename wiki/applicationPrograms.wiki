@@ -1,8 +1,8 @@
-#summary bamo128 and arduino sketches and C/C++/asm - application programs
+#summary bamo128 and arduino sketches or C/C++/asm - application programs
 
 You can upload application programs bamo128 from the arduino IDE or with the 'w' and 'W' - command from monitor. Programs are loaded at flash address 0 normally.<br>
-This programs overwrite the interrupt vector table at address 0 and if you activate the timer1 in "mainloop.asm" the system crash. <br>
-It crashed also, if you use the monitor 's' (step) or 'x'(start with breakpoint because it is realized with time2 interrupt.<br>
+This programs overwrite the interrupt vector table at address 0 and if you activate the timer1 in "mainloop.asm" the system crashes. <br>
+It crashes also, if you use the monitor 's' (step) or 'x'(start with breakpoint because it is realized with time2 interrupt.<br>
 But you can avoid this, if you in your C/C++/Arduino-sourcecode insert this lines (for atmega1280 or atmega328):<br>
 {{{
 #define	BYTES(word)	((word)*2)
@@ -50,3 +50,9 @@ an equivalent effect you get with a linker option:<br>
 -Wl,--defsym=__stack=0x8003ff<br>
 
 === Use of monitor functions and variables in application programs===
+The monitor contains useful variables and functions how currentImeMilliSec
+or conIn and conOut, the serial byte input and output.<br>
+You can use many in your application program.<br>
+Most public functions are C/C++ compatible (parameter passing, return value, use of registers,...).<br>
+Your sketch, C/C++ or asm program must make known this.<br>
+#define	SYSTIMEMILLISEC	(MONRAM+0x40)
