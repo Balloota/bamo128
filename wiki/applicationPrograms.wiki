@@ -58,7 +58,8 @@ Your sketch, C/C++ or asm program must make known this variables and functions o
 Bamo128 contains a jump table to this functions at the beginning (see bamo128.asm). So application can use fix addresses even if the monitor is updated and routines disarrange in monitor.<br>
 You can use a linker script to tell the linker where useful functions/variables are im monitor:<br>
 Example linkerscript link1280.lds for atmega1280:
-{{{ /* hi this is a linker script */
+{{{ 
+/* hi this is a linker script */
 /* monitor functions for C applications */
 mainLoop	= 0x1e004;	
 /* (LARGEBOOTSTART+2) ; Ruecksprung in Monitor aus Programm mit "ret" */
@@ -71,9 +72,12 @@ saveCPU		= 0x1e07c;	/* saveCPU step mod */
 mySysClock	= 0x1e070;	/* timer ms  F056*/
 startTimer1	= 0x1e074;      /* (LARGEBOOTSTART+58) */
 
-sysTime		= 0x7f40;	/* systime milliSec 4 bytes little endian */}}}
+sysTime		= 0x7f40;	/* systime milliSec 4 bytes little endian */
+}}}
 (The GNU environment works with byte addresses and the linker scripts runs not trough the preprocessor.)<br><br>
-{{{Another possibility is to tell the compiler what addresses are used:
+Another possibility is to tell the compiler what addresses are used:
+{{{
 char (*conIn)()		=(void*)(LARGEBOOTSTART+4);
 void (*conOut)(char)	=(void*)(LARGEBOOTSTART+6);
-#define	SYSTIMEMILLISEC	(MONRAM+0x40)}}}
+#define	SYSTIMEMILLISEC	(MONRAM+0x40)
+}}}
