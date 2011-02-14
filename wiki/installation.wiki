@@ -12,6 +12,7 @@ Bamo128 works with interrupt (timer2 for the step and break command, timer1 for 
 The Makefile contains goals for burning the monitor in the board CharonII (atmega128 and externtal 32KRAM), arduino Mega (atmega1280) and arduino Duemilanove (atmega328). In a terminal window type:<br>
 ||for arduino Mega ||for arduino Duemilanove and compatible||
 ||#> make all am   ||#> make all du||
+-----------------------------------------------------------------------------------------------
 <br><br>
 and for setting fuses in controller:<br>
 || 4K word bootsection 0xF000-0xFFFF || 2K word bootsection 0x3800 - 0x3FFF||
