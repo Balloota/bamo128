@@ -15,11 +15,13 @@ The Makefile contains goals for burning the monitor in the board CharonII (atmeg
 
 
 
------------------------------------------------------------------------------------------------
 and for setting fuses in controller:<br>
+|| arduino Mega|| arduino Duemilanove or UNO||
 || 4K word bootsection 0xF000-0xFFFF || 2K word bootsection 0x3800 - 0x3FFF||
 ||start at bootsection after reset  ||  start at bootsection after reset   ||
 ||#> make fuses am||#> make fuses du||
+
+
 For the duemilanove the monitor starts at 0x3000 and ends at 0x3FFF.
 At address 0x3800 (start after reset)in monitor  is a jump to 0x3000.<br><br>
 You can undo all software and fuses changes with the arduino IDE.
