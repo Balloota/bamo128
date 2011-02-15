@@ -1,6 +1,6 @@
 #summary bamo128 as arduino bootloader.
 === behavior of arduino boards and arduino bootloader===
-_You can reset arduino boards per software from pc over the serial USB-cable.<br>
+_You can reset arduino boards per software from pc over the serial USB-cable. <br>
 The software activates the DTR control line of serial port and a capacitor at the board produces an reset impuls.<br>
 The arduino integrated development environment (IDE) and avrdude (with the programmer option -carduino) use this software reset for bootloading.<br>
 The bootloader shipped with the arduino board waits after reset about 1/2 second for characters from serial USB-port.<br>
