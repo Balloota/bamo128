@@ -48,9 +48,9 @@ void code_init2 (void)
 }}}
 an equivalent effect you get with a linker option:<br>
 -Wl,--defsym=__stack=0x8003ff<br>
-and so save the monitor variables for overwriting and with "return" in application program go back to the monitor.
+and you save the monitor variables for overwriting. With "return" the application programs go back to the monitor.
 === Use of monitor functions and variables in application programs===
-The monitor contains useful variables and functions how currentTimeMilliSec
+The monitor contains useful variables and functions e.g. currentTimeMilliSec
 or conIn and conOut, the serial byte input and output.<br>
 You can use many in your application program.<br>
 Most public functions are C/C++ compatible (parameter passing, return value, use of registers,...).<br>
