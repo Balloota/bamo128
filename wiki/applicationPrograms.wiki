@@ -46,8 +46,8 @@ void code_init2 (void)
 #endif
 }
 }}}
-an equivalent effect you get with a linker option:<br>
--Wl,--defsym=__stack=0x8003ff<br>
+an equivalent effect (arduinoMega) you get with a linker option:<br>
+-Wl,--defsym=__stack=0x802100<br>
 and you save the monitor variables for overwriting. With "return" the application programs go back to the monitor.
 === Use of monitor functions and variables in application programs===
 The monitor contains useful variables and functions e.g. currentTimeMilliSec
