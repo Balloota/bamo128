@@ -1,5 +1,20 @@
 #summary bamo128 as arduino bootloader.
 === behavior of arduino boards and arduino bootloader===
+Arduino boards are equipped with a minimal monitor program. There are diverse variants of arduino boards (and bootloaders) and I am not a specialist for this topic (correct me, if somewhat is wrong here).<br>
+I'm only writing about the boards arduino duemilanove and arduino Mega.
+I think, the explanations can be applied to other boards also.<br>
+
+The fuses bits in this arduinos are programmed for:<br>
+- 2 K word bootsection<br>
+- start after reset at boot section<br>
+- interrupt vector table at address 0<br>
+The arduinos are programmed with the bootloader in the 2K word bootsections and a serial communication rate of 57600 baud.<br>
+
+After reset or power up the arduino waits for chars from serial line. If no chars (or wrong chars) are send to the board, the bootloader jumps to address 0000 whether there is an application program or not.<br>
+If chars and bytes are received from the bootloader and the sequenze of bytes is conform with the stk500 "upload programs format" you can upload a program (or data) in the flash (or eeprom).
+The arduino board can be resetted at power on, the button at board or via the DTR-control line of the serial RS232 interface. This is useful when you want to restart the monitor per pc program.
+ 
+
 _You can reset arduino boards per software from pc over the serial USB-cable. <br>
 The software activates the DTR control line of serial port and a capacitor at the board produces an reset impuls.<br>
 The arduino integrated development environment (IDE) and avrdude (with the programmer option -carduino) use this software reset for bootloading.<br>
