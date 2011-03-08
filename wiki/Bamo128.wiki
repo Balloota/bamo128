@@ -2,9 +2,11 @@
 = Bamo128 = 
 is a resident monitor program for AVR8 microcontroller.<br> It is written in assembler and you can burn it with an appropriate programmer (avrIspmkII, stk500,..) and programming software (arvdude) on the microcontroller. After reset the monitor starts and waits for interaction with the user over serial communication lines (RS232, USB) and a pc-terminal software. arduinokermit http://minikermit.googlecode.com is a terminal program well adapted for bamo128.<br>
 After reset (exactly about 1/2 second after reset - in this time bamo128 waits for external programmer in "ardiuno style") you see in the terminal window the greetings and the prompt line of bamo128:<br><br>
-_BAMo128 Version:0.08_<br>
-_written from students of the BA Berlin for the ArduinoMega_<br>
-_BAMo128_ #>
+{{{
+______________BAMo128 Version:0.08________________
+__written from students of the BA Berlin for the ArduinoMega__
+BAMO128#>
+}}}
 === Bamo128 commands ===
 ||'a'  || authors||
 ||'h'    || help||
